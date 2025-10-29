@@ -1,0 +1,137 @@
+{
+  "title": "Premium Cloud Storage - Special Offer",
+  "seo": {
+    "description": "Get 50% off premium cloud storage with enterprise features. Secure, fast, and reliable storage for your business."
+  },
+  "hero": {
+    "headline": "Enterprise Cloud Storage at Startup Prices",
+    "subhead": "Join over 10,000 businesses using our secure cloud storage platform. Get 50% off your first year with this exclusive offer.",
+    "cta": {
+      "text": "Start Free Trial",
+      "href": "https://example.com/trial"
+    },
+    "video_url": "https://vimeo.com/123456789"
+  },
+  "benefits": {
+    "title": "Why Choose Our Platform?",
+    "items": [
+      {
+        "title": "Military-Grade Security",
+        "body": "Your data is protected with AES-256 encryption at rest and in transit. SOC 2 Type II certified with 99.9% uptime SLA."
+      },
+      {
+        "title": "Lightning Fast Sync",
+        "body": "Access your files from anywhere with our global CDN. Automatic sync across all your devices in real-time."
+      },
+      {
+        "title": "Unlimited Collaboration",
+        "body": "Share files securely with your team. Advanced permissions, version control, and commenting built-in."
+      }
+    ]
+  },
+  "options": {
+    "title": "Choose Your Plan",
+    "items": [
+      {
+        "title": "Starter",
+        "price": "$9/month",
+        "features": [
+          "100 GB storage",
+          "5 team members",
+          "Basic support",
+          "99.5% uptime SLA"
+        ],
+        "cta": {
+          "text": "Get Started",
+          "href": "https://example.com/plans/starter"
+        }
+      },
+      {
+        "title": "Professional",
+        "price": "$29/month",
+        "features": [
+          "1 TB storage",
+          "25 team members",
+          "Priority support",
+          "99.9% uptime SLA",
+          "Advanced security"
+        ],
+        "cta": {
+          "text": "Go Pro",
+          "href": "https://example.com/plans/pro"
+        },
+        "highlight": true
+      },
+      {
+        "title": "Enterprise",
+        "price": "Custom",
+        "features": [
+          "Unlimited storage",
+          "Unlimited users",
+          "24/7 dedicated support",
+          "99.99% uptime SLA",
+          "Custom integrations"
+        ],
+        "cta": {
+          "text": "Contact Sales",
+          "href": "https://example.com/contact"
+        }
+      }
+    ]
+  },
+  "proof": {
+    "quote": "Switching to this platform was the best decision we made. Our team productivity increased by 40% and we cut storage costs in half.",
+    "attribution": {
+      "name": "Sarah Chen",
+      "title": "CTO",
+      "company": "TechStart Inc"
+    }
+  },
+  "social": {
+    "title": "As Seen On",
+    "items": [
+      {
+        "type": "press",
+        "name": "TechCrunch Feature",
+        "url": "https://techcrunch.com/article",
+        "logo_url": "https://example.com/logos/techcrunch.png"
+      },
+      {
+        "type": "award",
+        "name": "Best Cloud Storage 2024",
+        "url": "https://awards.com/cloud-storage",
+        "logo_url": "https://example.com/logos/award.png"
+      },
+      {
+        "type": "press",
+        "name": "Forbes Review",
+        "url": "https://forbes.com/review",
+        "logo_url": "https://example.com/logos/forbes.png"
+      }
+    ]
+  },
+  "secondary": {
+    "title": "Trusted by Industry Leaders",
+    "body": "Join Fortune 500 companies and fast-growing startups who rely on our platform for their critical business data."
+  },
+  "seller": {
+    "name": "CloudTech Solutions",
+    "about": "We've been providing enterprise cloud solutions since 2015. Our mission is to make secure, reliable storage accessible to businesses of all sizes.",
+    "cta_primary": {
+      "text": "Learn More",
+      "href": "https://example.com/about"
+    },
+    "cta_more": {
+      "text": "View Case Studies",
+      "href": "https://example.com/cases"
+    }
+  },
+  "footer": {
+    "logo_url": "https://example.com/logo.png",
+    "cta": {
+      "text": "Start Your Free Trial",
+      "href": "https://example.com/trial"
+    },
+    "copyright": "CloudTech Solutions Inc."
+  }
+}
