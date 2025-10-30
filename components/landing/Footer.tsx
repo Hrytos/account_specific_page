@@ -25,22 +25,22 @@ export function Footer({ footer, brandLogoUrl }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1a202c] text-white py-12">
+    <footer className="bg-[#1a202c] text-white py-6">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <div className="flex flex-col items-center space-y-6">
+        <div className="flex flex-col items-center space-y-3">
           {/* Logo */}
           {brandLogoUrl && (
             <div className="opacity-90">
               <img
                 src={brandLogoUrl}
                 alt="Company Logo"
-                className="h-10 w-auto"
+                className="h-8 w-auto"
               />
             </div>
           )}
 
           {/* Copyright and Powered by Hrytos */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-1">
             <p className="text-gray-400 text-sm">
               © {currentYear} All rights reserved.
             </p>

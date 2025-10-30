@@ -26,47 +26,70 @@ export function SellerInfo({ seller }: SellerInfoProps) {
   }
 
   return (
-    <section className="py-20 md:py-28 bg-white">
-      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            About Us
-          </h2>
-          <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
-        </div>
-
-        <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl p-8 md:p-12 border border-gray-200 shadow-xl">
-          {seller.body && (
-            <div className="text-lg text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
-              <p>{seller.body}</p>
+    <section className="py-20 md:py-28 bg-gradient-to-br from-gray-50 to-white">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          {/* Left Side - About Us Content */}
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                About Us
+              </h2>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
             </div>
-          )}
 
-          {seller.links?.primary && (
-            <div className="flex justify-center">
-              <a
-                href={seller.links.primary}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
-              >
-                Visit Our Website
-                <svg
-                  className="ml-2 w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {seller.body && (
+              <div className="prose prose-lg max-w-none">
+                <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                  {seller.body}
+                </p>
+              </div>
+            )}
+
+            {seller.links?.primary && (
+              <div className="pt-4">
+                <a
+                  href={seller.links.primary}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
+                  Visit Our Website
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Right Side - Decorative Element / Reserved for future content */}
+          <div className="hidden lg:flex items-center justify-center">
+            <div className="relative w-full h-96 bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 rounded-3xl shadow-2xl overflow-hidden">
+              {/* Decorative circles */}
+              <div className="absolute top-10 right-10 w-40 h-40 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
+              <div className="absolute bottom-10 left-10 w-40 h-40 bg-indigo-400 rounded-full opacity-20 blur-3xl"></div>
+              
+              {/* Placeholder for future content */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-gray-400">
+                  <svg className="w-24 h-24 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>
