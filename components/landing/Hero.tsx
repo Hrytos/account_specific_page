@@ -26,47 +26,45 @@ export function Hero({ hero }: HeroProps) {
     return null;
   }
 
-  const { headline, subhead, cta, media } = hero;
+  const { headline, subhead, shortDescription, cta, media } = hero;
   const videoUrl = media?.videoUrl;
   const vimeoId = videoUrl ? parseVimeoId(videoUrl) : null;
 
   return (
-    <section className="bg-white py-12 md:py-20">
+    <section className="relative bg-gradient-to-br from-slate-50 via-white to-blue-50 py-16 md:py-24 lg:py-32 overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
+      
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Text Content - Left Column */}
-          <div className="space-y-8">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-normal text-gray-900 leading-tight">
+          <div className="space-y-8 lg:pr-8">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
               {headline}
             </h1>
 
             {subhead && (
-              <div className="space-y-6 text-base md:text-lg text-gray-600 leading-relaxed">
+              <div className="space-y-4 text-lg md:text-xl text-gray-600 leading-relaxed">
                 {subhead.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx}>{paragraph}</p>
+                  <p key={idx} className="text-gray-600">
+                    {paragraph}
+                  </p>
                 ))}
               </div>
             )}
 
-            {cta && cta.href && (
-              <div className="pt-2">
-                <a
-                  href={cta.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block px-10 py-3.5 bg-slate-700 hover:bg-slate-800 text-white font-medium text-base rounded-md transition-colors duration-200"
-                >
-                  {cta.text || 'Get Started'}
-                </a>
+            {shortDescription && (
+              <div className="text-base md:text-lg text-gray-700 leading-relaxed">
+                <p>{shortDescription}</p>
               </div>
             )}
           </div>
 
-          {/* Video/Media */}
+          {/* Video/Media - Right Column */}
           {videoUrl && (
             <div className="w-full">
               {vimeoId ? (
-                <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden shadow-md" style={{ paddingBottom: '56.25%' }}>
+                <div className="relative w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/10" style={{ paddingBottom: '56.25%' }}>
                   <iframe
                     src={getVimeoEmbedUrl(vimeoId)}
                     className="absolute top-0 left-0 w-full h-full"
@@ -78,13 +76,16 @@ export function Hero({ hero }: HeroProps) {
                   />
                 </div>
               ) : (
-                <div className="bg-gray-100 rounded-lg p-8 text-center">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-12 text-center shadow-xl ring-1 ring-gray-900/10">
                   <a
                     href={videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-md transition-colors"
+                    className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
                   >
+                    <svg className="mr-2 w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
                     Watch Video
                   </a>
                 </div>
@@ -92,6 +93,50 @@ export function Hero({ hero }: HeroProps) {
             </div>
           )}
         </div>
+
+        {/* CTA Buttons - Full Width Below Grid */}
+        {cta && cta.href && (
+          <div className="mt-12 flex items-center gap-8 flex-wrap">
+            <a
+              href={cta.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-12 py-4 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 whitespace-nowrap"
+            >
+              {cta.text || 'Get Started'}
+            </a>
+            
+            <button
+              onClick={() => {
+                const benefitsSection = document.getElementById('benefits-section');
+                benefitsSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
+            >
+              Explore Benefits
+            </button>
+            
+            <button
+              onClick={() => {
+                const optionsSection = document.getElementById('options-section');
+                optionsSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
+            >
+              Review Automation Options
+            </button>
+            
+            <button
+              onClick={() => {
+                const socialSection = document.getElementById('social-proofs-section');
+                socialSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
+            >
+              See Success Stories
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

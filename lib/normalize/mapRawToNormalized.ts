@@ -26,6 +26,32 @@ import type {
 } from './normalized.types';
 
 /**
+ * Extract buyer company name from biggestBusinessBenefitBuyerStatement
+ * e.g., "Make Duke Energy's grid..." → "Duke Energy"
+ * e.g., "Make Adient's manufacturing..." → "Adient"
+ */
+function extractBuyerName(statement: string | undefined): string | null {
+  if (!statement) return null;
+  
+  // Match pattern: "Make [Company Name]'s ..."
+  const match = statement.match(/Make\s+([^']+)'s/i);
+  return match ? match[1].trim() : null;
+}
+
+/**
+ * Extract seller company name from sellerDescription
+ * e.g., "Cyngn develops & deploys..." → "Cyngn"
+ * e.g., "BlueGrid Energy develops..." → "BlueGrid Energy"
+ */
+function extractSellerName(description: string | undefined): string | null {
+  if (!description) return null;
+  
+  // Get the first sentence and extract the company name (first 1-3 words before "develops" or similar verbs)
+  const match = description.match(/^([A-Z][A-Za-z\s&]+?)(?:\s+develops|\s+provides|\s+creates|\s+builds)/);
+  return match ? match[1].trim() : null;
+}
+
+/**
  * Maps raw JSON input to normalized content structure
  * This function performs the transformation WITHOUT validation
  * Validation happens in a separate phase
@@ -68,16 +94,23 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
     sanitize(raw.sellerLinkWebsite) ||
     '';
   
+  // Dynamic CTA text using seller name
+  const ctaText = raw.SellersName 
+    ? `Talk to ${raw.SellersName}`
+    : 'Book a meeting';
+  
   const hero: Hero = {
     headline: title,
     subhead: sanitize(raw.synopsisBusinessBenefit),
+    shortDescription: sanitize(raw.shortDescriptionBusinessBenefit),
     cta: {
-      text: 'Book a meeting',
+      text: ctaText,
       href: ctaHref,
     },
     media: {
       videoUrl: sanitize(raw.quickDemoLinks),
     },
+    sellerName: raw.SellersName || null,
   };
 
   // Benefits section
@@ -97,7 +130,19 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
   // Options section
   let options: Options | undefined;
   if (raw.options && raw.options.length > 0) {
+    // Use direct BuyersName and SellersName fields if provided, otherwise fall back to extraction
+    const buyerName = raw.BuyersName || extractBuyerName(raw.biggestBusinessBenefitBuyerStatement);
+    const sellerName = raw.SellersName || extractSellerName(raw.sellerDescription);
+    
+    // Generate title: "How can [Seller] help [Buyer] ?"
+    const optionsTitle = buyerName && sellerName
+      ? `How can ${sellerName} help ${buyerName} ?`
+      : null;
+    
     options = {
+      title: sanitize(optionsTitle),
+      intro: sanitize(raw.synopsisAutomationOptions),
+      sellerName: sellerName || null,
       cards: raw.options.map((opt) => ({
         title: sanitize(opt.title) || '',
         description: sanitize(opt.description),
@@ -111,19 +156,15 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
     proof = {
       title: sanitize(raw.mostRelevantProof.title),
       summaryTitle: sanitize(raw.mostRelevantProof.summaryTitle),
-      summaryBody: sanitize(raw.mostRelevantProof.summaryBody),
-      quote: raw.mostRelevantProof.quote
-        ? {
-            text: sanitize(raw.mostRelevantProof.quote.text),
-            attribution: {
-              name: sanitize(raw.mostRelevantProof.quote.attribution?.name),
-              role: sanitize(raw.mostRelevantProof.quote.attribution?.role),
-              company: sanitize(
-                raw.mostRelevantProof.quote.attribution?.company
-              ),
-            },
-          }
-        : undefined,
+      summaryBody: sanitize(raw.mostRelevantProof.summaryContent), // Use summaryContent from JSON
+      quote: {
+        text: sanitize(raw.mostRelevantProof.quoteContent), // Use quoteContent from JSON
+        attribution: {
+          name: sanitize(raw.mostRelevantProof.quoteAuthorFullname), // Use quoteAuthorFullname
+          role: sanitize(raw.mostRelevantProof.quoteAuthorDesignation), // Use quoteAuthorDesignation
+          company: sanitize(raw.mostRelevantProof.quoteAuthorCompany), // Use quoteAuthorCompany
+        },
+      },
     };
   }
 
@@ -136,6 +177,8 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
         description: sanitize(sp.description),
         link: sp.link, // Don't sanitize URLs here, validation will check them
       })),
+      buyerName: raw.BuyersName || null,
+      sellerName: raw.SellersName || null,
     };
   }
 
@@ -148,6 +191,8 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
     secondary = {
       title: sanitize(raw.secondHighestOperationalBenefitStatement),
       body: sanitize(raw.secondHighestOperationalBenefitDescription),
+      link: sanitize(raw.sellerLinkWebsite) || sanitize(raw.sellerLinkReadMore),
+      sellerName: raw.SellersName || null,
     };
   }
 

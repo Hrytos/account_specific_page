@@ -1,0 +1,68 @@
+{
+  "BuyersName": "Adient",
+  "SellersName": "Cyngn",
+  "biggestBusinessBenefitBuyerStatement": "Make Adient's manufacturing smart & resilient to volatile markets",
+  "synopsisBusinessBenefit": "Layoffs, Plant Shutdowns, Losing Customers, EHS penalties & New EV Business Lines - there is so much volatility. Become resilient by automating movement of assemblies - seat-frame, cushion and other material handling tasks.",
+  "shortDescriptionBusinessBenefit": "Volatile markets, perennial labor shortage and increasing customer expectations make it increasingly important to find the right automation partner for Adient who can delicately balance - immediate benefits, quick RoI, flexibility and reliability. Cyngn can be that trusted partner for Adient.",
+  "quickDemoLinks": "https://vimeo.com/919773154",
+  "highestOperationalBenefit": {
+    "highestOperationalBenefitStatement": "Meet 'Smart Manufacturing' goals with Cyngn's DriveMod Autonomous Tuggers",
+    "benefits": [
+      {
+        "statement": "Flexibly scale operations in response to business needs",
+        "content": "Cyngn's on-demand manual to autonomous mode shifting capabilities allows you to manage Night and peak shifts with breeze. Re-use robots between workflows - replenishment, assembly milk-runs, ad-hoc drop jobs etc. 'Robotics-as-service' pricing model allows you to reduce Capex, control peak spends and realise quicker RoI"
+      },
+      {
+        "statement": "Control the demand for forklift drivers & retain them",
+        "content": "Autonomous forklifts work 24x7 with fever accidents allowing you to meet aggressive production targets. Minimal overwork, safer factories & better working conditions helps attract & retain high-quality workforce"
+      },
+      {
+        "statement": "Fewer downtimes, easier spare sourcing & peace of mind",
+        "content": "Cyngn's DriveMod is built upon best in class & popular Industrial tuggers. Their time tested hardware and JIT spare availability ensures super quick recovery times"
+      }
+    ]
+  },
+  "synopsisAutomationOptions": "The Normal, IL facility could potentially become a lighthouse for future fully autonomous mobile assembly lines at Adient. Here are forecasted plans to get there.",
+  "options": [
+    {
+      "title": "Pilot at upcoming Normal, IL facility",
+      "description": "The new 85,000 sft. greenhouse site for EV customers gives you a clean slate to see how Cyngn's DriveMod tuggers can really drive Smart Manufacturing initiatives."
+    },
+    {
+      "title": "Pilot at the super 150,000 sft. sites",
+      "description": "Riverside MO, BattleCreek MI or right at HQ - Plymouth MI can be great pilot sites to demonstrate the value of Cyngn's DriveMod. Unlock two benefits at once - realise immediate wins & build a case for a successful, full deployment"
+    }
+  ],
+  "mostRelevantProof": {
+    "title": "How One Facility Turned 200 Weekly Trips Into Promotions for Their People",
+    "summaryTitle": "200 Weekly Trips — Now Fully Automated",
+    "summaryContent": "At U.S. Continental, employees used to make 200 trips a week moving pallets between two buildings. After introducing our autonomous tugger, the robot took on the heavy lifting — freeing people from repetitive work. The result? Operations run smoother, and employees now have the chance to take on higher-value roles, with many even earning promotions.",
+    "quoteContent": "Before deploying Cyngn's autonomous vehicle, we moved pallets of materials one at a time across the parking lot. Now, we move four pallets at a time and do not tie up our staff transporting materials around the property.",
+    "quoteAuthorFullname": "Steve Bergmeyer",
+    "quoteAuthorDesignation": "Continuous Improvement & Quality Manager",
+    "quoteAuthorCompany": "Coats (Auto Equipment Manufacturer)"
+  },
+  "socialProofs": [
+    {
+      "type": "Customer Story",
+      "description": "How Coats Saved 500+ Labor Hours with Autonomous DriveMod Tuggers",
+      "link": "https://vimeo.com/1086894365"
+    },
+    {
+      "type": "Case Study",
+      "description": "US Continental found that DriveMod was 4X more efficient",
+      "link": "https://www.dropbox.com/scl/fi/8exd262xblj65ibxva5zw/DriveMod-Case-Study-U.S.-Continental.pdf?rlkey=hf9xmgrcgguzvjv5h9omx8yu1&st=v4603nsl&dl=0"
+    },
+    {
+      "type": "Press Release",
+      "description": "Cyngn joins John Deere Supply Base",
+      "link": "https://www.cyngn.com/pr/cyngn-joins-john-deere-supply-base"
+    }
+  ],
+  "sellerLinkReadMore": "https://www.cyngn.com/resources/case-studies",
+  "secondHighestOperationalBenefitStatement": "Autonomous vehicles are more safer, viable & flexible than retrofitting existing forklifts with safety packages.",
+  "secondHighestOperationalBenefitDescription": "Cyngn's DriveMod uses LiDAR cameras & advanced AI to safely navigate its way around your shop floor while avoiding obstacles - pedestrians, other vehicles & stationary objects. Minimise accidents and make workplace safer with Cyngn",
+  "sellerDescription": "Cyngn develops & deploys Autonomous Vehicle technology for industrial organisations. Our DriveMod Tugger hauls up to 12,000 lbs, travels inside and out, and targets a typical payback period of less than 2 years while the DriveMod Forklift lifts heavy loads that use non-standard pallets.",
+  "sellerLinkWebsite": "https://www.cyngn.com/",
+  "meetingSchedulerLink": "https://meetings.hubspot.com/cseidenberg/abm"
+}

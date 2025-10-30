@@ -26,30 +26,33 @@ export function SellerInfo({ seller }: SellerInfoProps) {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
-      <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-        <h2 className="text-3xl md:text-4xl font-normal text-gray-900 mb-8">
-          About Us
-        </h2>
+    <section className="py-20 md:py-28 bg-white">
+      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            About Us
+          </h2>
+          <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+        </div>
 
-        {seller.body && (
-          <div className="text-gray-600 leading-relaxed mb-8">
-            <p>{seller.body}</p>
-          </div>
-        )}
+        <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl p-8 md:p-12 border border-gray-200 shadow-xl">
+          {seller.body && (
+            <div className="text-lg text-gray-700 leading-relaxed mb-8 max-w-3xl mx-auto">
+              <p>{seller.body}</p>
+            </div>
+          )}
 
-        {(seller.links?.primary || seller.links?.more) && (
-          <div className="flex flex-col sm:flex-row gap-4">
-            {seller.links?.primary && (
+          {seller.links?.primary && (
+            <div className="flex justify-center">
               <a
                 href={seller.links.primary}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-md transition-colors"
+                className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
               >
                 Visit Our Website
                 <svg
-                  className="ml-2 w-4 h-4"
+                  className="ml-2 w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -62,33 +65,9 @@ export function SellerInfo({ seller }: SellerInfoProps) {
                   />
                 </svg>
               </a>
-            )}
-
-            {seller.links?.more && (
-              <a
-                href={seller.links.more}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium rounded-md transition-colors"
-              >
-                Learn More
-                <svg
-                  className="ml-2 w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
-              </a>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

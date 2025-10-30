@@ -22,6 +22,8 @@ export default function TestPhase2Page() {
     try {
       // Test 1: Valid input
       const validInput: RawLandingContent = {
+        BuyersName: 'Acme Corporation',
+        SellersName: 'TechFlow Solutions',
         biggestBusinessBenefitBuyerStatement: 'Save 40% on costs',
         synopsisBusinessBenefit: 'Transform your business with AI automation.',
         meetingSchedulerLink: 'https://calendly.com/meeting',
@@ -40,6 +42,8 @@ export default function TestPhase2Page() {
 
       // Test 2: Invalid input (missing required, bad URLs)
       const invalidInput: RawLandingContent = {
+        BuyersName: '', // Empty (invalid)
+        SellersName: '', // Empty (invalid)
         biggestBusinessBenefitBuyerStatement: '', // Empty (invalid)
         meetingSchedulerLink: 'http://not-https.com', // Not HTTPS
         sellerLinkWebsite: 'invalid-url', // Not a URL
@@ -49,6 +53,8 @@ export default function TestPhase2Page() {
 
       // Test 3: Valid but with warnings (long text, non-Vimeo)
       const warningInput: RawLandingContent = {
+        BuyersName: 'Test Company',
+        SellersName: 'Test Vendor',
         biggestBusinessBenefitBuyerStatement:
           'This is a very long headline that exceeds the recommended 90 character limit but is still under the hard cap',
         synopsisBusinessBenefit: 'Short description.',

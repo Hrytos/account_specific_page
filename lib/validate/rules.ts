@@ -28,6 +28,8 @@ import { getContrastRatio, WCAG_CONTRAST } from '@/lib/util/contrast';
 export const LENGTH_CAPS = {
   HEADLINE: 90,
   SUBHEAD: 220,
+  SHORT_DESC: 300, // New: for shortDescriptionBusinessBenefit
+  OPTIONS_INTRO: 250, // New: for synopsisAutomationOptions
   BENEFIT_BODY: 400,
   QUOTE: 300,
   META_DESCRIPTION: 160,
@@ -39,6 +41,8 @@ export const LENGTH_CAPS = {
 export const HARD_LIMITS = {
   HEADLINE: Math.ceil(LENGTH_CAPS.HEADLINE * 1.2), // 108
   SUBHEAD: Math.ceil(LENGTH_CAPS.SUBHEAD * 1.2), // 264
+  SHORT_DESC: Math.ceil(LENGTH_CAPS.SHORT_DESC * 1.2), // 360
+  OPTIONS_INTRO: Math.ceil(LENGTH_CAPS.OPTIONS_INTRO * 1.2), // 300
   BENEFIT_BODY: Math.ceil(LENGTH_CAPS.BENEFIT_BODY * 1.2), // 480
   QUOTE: Math.ceil(LENGTH_CAPS.QUOTE * 1.2), // 360
 } as const;
@@ -70,6 +74,16 @@ export function validateRequiredFields(
     errors.push(createError(ERROR_CODES.E_HERO_REQ, 'biggestBusinessBenefitBuyerStatement'));
   }
 
+  // Check BuyersName is present
+  if (!isNonEmpty(raw.BuyersName)) {
+    errors.push(createError(ERROR_CODES.E_HERO_REQ, 'BuyersName'));
+  }
+
+  // Check SellersName is present
+  if (!isNonEmpty(raw.SellersName)) {
+    errors.push(createError(ERROR_CODES.E_HERO_REQ, 'SellersName'));
+  }
+
   // Check at least one section exists
   const hasBenefits = (raw.highestOperationalBenefit?.benefits?.length ?? 0) > 0;
   const hasOptions = (raw.options?.length ?? 0) > 0;
@@ -96,6 +110,11 @@ export function validateUrls(raw: RawLandingContent): ErrorItem[] {
   // Seller website (optional, but must be https if present)
   if (raw.sellerLinkWebsite && !isHttpsUrl(raw.sellerLinkWebsite)) {
     errors.push(createError(ERROR_CODES.E_URL_SELLER, 'sellerLinkWebsite'));
+  }
+
+  // Seller read more link (optional, but must be https if present)
+  if (raw.sellerLinkReadMore && !isHttpsUrl(raw.sellerLinkReadMore)) {
+    errors.push(createError(ERROR_CODES.E_URL_SELLER, 'sellerLinkReadMore'));
   }
 
   // Demo video link (optional, but must be https if present)
@@ -145,6 +164,34 @@ export function validateTextLimits(raw: RawLandingContent): ErrorItem[] {
     );
   }
 
+  // Short description (Hero secondary text)
+  if (
+    raw.shortDescriptionBusinessBenefit &&
+    raw.shortDescriptionBusinessBenefit.length > HARD_LIMITS.SHORT_DESC
+  ) {
+    errors.push(
+      createError(
+        ERROR_CODES.E_TEXT_LIMIT,
+        'shortDescriptionBusinessBenefit',
+        `Short description exceeds hard limit of ${HARD_LIMITS.SHORT_DESC} characters.`
+      )
+    );
+  }
+
+  // Options intro text
+  if (
+    raw.synopsisAutomationOptions &&
+    raw.synopsisAutomationOptions.length > HARD_LIMITS.OPTIONS_INTRO
+  ) {
+    errors.push(
+      createError(
+        ERROR_CODES.E_TEXT_LIMIT,
+        'synopsisAutomationOptions',
+        `Options intro exceeds hard limit of ${HARD_LIMITS.OPTIONS_INTRO} characters.`
+      )
+    );
+  }
+
   // Benefit bodies
   if (raw.highestOperationalBenefit?.benefits) {
     const overLimit = raw.highestOperationalBenefit.benefits.some(
@@ -163,13 +210,13 @@ export function validateTextLimits(raw: RawLandingContent): ErrorItem[] {
 
   // Quote
   if (
-    raw.mostRelevantProof?.quote?.text &&
-    raw.mostRelevantProof.quote.text.length > HARD_LIMITS.QUOTE
+    raw.mostRelevantProof?.quoteContent &&
+    raw.mostRelevantProof.quoteContent.length > HARD_LIMITS.QUOTE
   ) {
     errors.push(
       createError(
         ERROR_CODES.E_TEXT_LIMIT,
-        'mostRelevantProof.quote.text',
+        'mostRelevantProof.quoteContent',
         `Quote exceeds hard limit of ${HARD_LIMITS.QUOTE} characters.`
       )
     );
@@ -202,6 +249,24 @@ export function checkTextWarnings(raw: RawLandingContent): WarningItem[] {
     warnings.push(createWarning(WARNING_CODES.W_SUBHEAD_LONG, 'synopsisBusinessBenefit'));
   }
 
+  // Short description
+  if (
+    raw.shortDescriptionBusinessBenefit &&
+    raw.shortDescriptionBusinessBenefit.length > LENGTH_CAPS.SHORT_DESC &&
+    raw.shortDescriptionBusinessBenefit.length <= HARD_LIMITS.SHORT_DESC
+  ) {
+    warnings.push(createWarning(WARNING_CODES.W_SUBHEAD_LONG, 'shortDescriptionBusinessBenefit'));
+  }
+
+  // Options intro
+  if (
+    raw.synopsisAutomationOptions &&
+    raw.synopsisAutomationOptions.length > LENGTH_CAPS.OPTIONS_INTRO &&
+    raw.synopsisAutomationOptions.length <= HARD_LIMITS.OPTIONS_INTRO
+  ) {
+    warnings.push(createWarning(WARNING_CODES.W_SUBHEAD_LONG, 'synopsisAutomationOptions'));
+  }
+
   // Benefit bodies
   if (raw.highestOperationalBenefit?.benefits) {
     const hasLongBenefit = raw.highestOperationalBenefit.benefits.some(
@@ -217,11 +282,11 @@ export function checkTextWarnings(raw: RawLandingContent): WarningItem[] {
 
   // Quote
   if (
-    raw.mostRelevantProof?.quote?.text &&
-    raw.mostRelevantProof.quote.text.length > LENGTH_CAPS.QUOTE &&
-    raw.mostRelevantProof.quote.text.length <= HARD_LIMITS.QUOTE
+    raw.mostRelevantProof?.quoteContent &&
+    raw.mostRelevantProof.quoteContent.length > LENGTH_CAPS.QUOTE &&
+    raw.mostRelevantProof.quoteContent.length <= HARD_LIMITS.QUOTE
   ) {
-    warnings.push(createWarning(WARNING_CODES.W_QUOTE_LONG, 'mostRelevantProof.quote.text'));
+    warnings.push(createWarning(WARNING_CODES.W_QUOTE_LONG, 'mostRelevantProof.quoteContent'));
   }
 
   return warnings;

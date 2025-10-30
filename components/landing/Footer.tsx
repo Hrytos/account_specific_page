@@ -25,12 +25,12 @@ export function Footer({ footer, brandLogoUrl }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white border-t border-gray-200 py-8">
+    <footer className="bg-[#1a202c] text-white py-12">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
         <div className="flex flex-col items-center space-y-6">
           {/* Logo */}
           {brandLogoUrl && (
-            <div>
+            <div className="opacity-90">
               <img
                 src={brandLogoUrl}
                 alt="Company Logo"
@@ -39,30 +39,15 @@ export function Footer({ footer, brandLogoUrl }: FooterProps) {
             </div>
           )}
 
-          {/* Final CTA */}
-          {footer?.cta && footer.cta.href && (
-            <div className="text-center">
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-                Ready to Get Started?
-              </h3>
-              <a
-                href={footer.cta.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-8 py-3 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-md transition-colors"
-              >
-                {footer.cta.text || 'Get Started'}
-              </a>
-            </div>
-          )}
-
-          {/* Divider */}
-          <div className="w-full border-t border-gray-200"></div>
-
           {/* Copyright and Powered by Hrytos */}
-          <div className="text-center text-gray-500 text-sm space-y-1">
-            <p>© {currentYear} All rights reserved.</p>
-            <p className="text-xs">Powered by Hrytos</p>
+          <div className="text-center space-y-2">
+            <p className="text-gray-400 text-sm">
+              © {currentYear} All rights reserved.
+            </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+              <span>Powered by</span>
+              <span className="font-semibold text-blue-400">Hrytos</span>
+            </div>
           </div>
         </div>
       </div>
