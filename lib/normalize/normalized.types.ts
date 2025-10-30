@@ -104,6 +104,7 @@ export interface Options {
   intro?: string | null; // e.g., "The Normal, IL facility..."
   cards?: OptionCard[];
   sellerName?: string | null; // For dynamic button text
+  meetingLink?: string | null; // Link to meeting scheduler
 }
 
 /**
@@ -149,6 +150,7 @@ export interface SocialProofs {
   items?: SocialProofItem[];
   buyerName?: string | null; // For dynamic headline
   sellerName?: string | null; // For dynamic headline
+  readMoreLink?: string | null; // Link to seller's read more page
 }
 
 /**

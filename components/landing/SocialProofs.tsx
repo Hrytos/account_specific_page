@@ -82,6 +82,33 @@ export function SocialProofs({ social }: SocialProofsProps) {
             </a>
           ))}
         </div>
+
+        {/* Read More Button */}
+        {social.readMoreLink && (
+          <div className="mt-12 text-center">
+            <a
+              href={social.readMoreLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg rounded-xl border-2 border-gray-300 hover:border-blue-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+            >
+              Read More
+              <svg
+                className="ml-3 w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

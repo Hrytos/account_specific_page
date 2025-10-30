@@ -62,9 +62,20 @@ export function Options({ options }: OptionsProps) {
                 </p>
               )}
 
-              <button className="w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg">
-                {buttonText}
-              </button>
+              {options.meetingLink ? (
+                <a
+                  href={options.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg text-center"
+                >
+                  {buttonText}
+                </a>
+              ) : (
+                <button className="w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg">
+                  {buttonText}
+                </button>
+              )}
             </div>
           ))}
         </div>

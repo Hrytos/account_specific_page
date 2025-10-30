@@ -143,6 +143,7 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
       title: sanitize(optionsTitle),
       intro: sanitize(raw.synopsisAutomationOptions),
       sellerName: sellerName || null,
+      meetingLink: sanitize(raw.meetingSchedulerLink) || null,
       cards: raw.options.map((opt) => ({
         title: sanitize(opt.title) || '',
         description: sanitize(opt.description),
@@ -179,6 +180,7 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
       })),
       buyerName: raw.BuyersName || null,
       sellerName: raw.SellersName || null,
+      readMoreLink: sanitize(raw.sellerLinkReadMore) || null,
     };
   }
 
@@ -191,7 +193,7 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
     secondary = {
       title: sanitize(raw.secondHighestOperationalBenefitStatement),
       body: sanitize(raw.secondHighestOperationalBenefitDescription),
-      link: sanitize(raw.sellerLinkWebsite) || sanitize(raw.sellerLinkReadMore),
+      link: sanitize(raw.meetingSchedulerLink) || sanitize(raw.sellerLinkWebsite) || sanitize(raw.sellerLinkReadMore),
       sellerName: raw.SellersName || null,
     };
   }
