@@ -25,32 +25,57 @@ export function Options({ options }: OptionsProps) {
     return null;
   }
 
+  const buttonText = options.sellerName 
+    ? `Talk to ${options.sellerName}`
+    : 'Learn More';
+
   return (
-    <section className="py-16 md:py-24 bg-gray-50">
+    <section id="options-section" className="py-20 md:py-28 bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <h2 className="text-3xl md:text-4xl font-normal text-gray-900 text-center mb-16">
-          Choose Your Plan
-        </h2>
+        {/* Dynamic title from normalized data */}
+        {options.title && (
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center mb-4">
+            {options.title}
+          </h2>
+        )}
+        
+        {/* Dynamic intro text from synopsisAutomationOptions */}
+        {options.intro && (
+          <p className="text-center text-gray-600 text-lg mb-16 max-w-3xl mx-auto leading-relaxed">
+            {options.intro}
+          </p>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {options.cards.map((card, index) => (
             <div
               key={index}
-              className="bg-[#2D3E50] rounded-lg p-8"
+              className="group bg-[#2C3E50] hover:bg-[#34495E] rounded-2xl p-10 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
             >
-              <h3 className="text-2xl font-semibold text-white mb-4">
+              <h3 className="text-2xl font-bold mb-6 leading-tight">
                 {card.title}
               </h3>
 
               {card.description && (
-                <p className="text-gray-300 leading-relaxed mb-8">
+                <p className="text-gray-300 leading-relaxed mb-8 text-base">
                   {card.description}
                 </p>
               )}
 
-              <button className="w-full px-6 py-3 bg-white hover:bg-gray-100 text-[#2D3E50] font-medium rounded-md transition-colors">
-                Learn More
-              </button>
+              {options.meetingLink ? (
+                <a
+                  href={options.meetingLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg text-center"
+                >
+                  {buttonText}
+                </a>
+              ) : (
+                <button className="w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg">
+                  {buttonText}
+                </button>
+              )}
             </div>
           ))}
         </div>

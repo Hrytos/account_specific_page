@@ -66,8 +66,10 @@ export interface Media {
 export interface Hero {
   headline: string;
   subhead?: string | null;
+  shortDescription?: string | null; // Additional description field
   cta?: CTA;
   media?: Media;
+  sellerName?: string | null; // For dynamic CTA text
 }
 
 /**
@@ -98,7 +100,11 @@ export interface OptionCard {
  * Options section
  */
 export interface Options {
+  title?: string | null; // e.g., "How can Cyngn help Adient ?"
+  intro?: string | null; // e.g., "The Normal, IL facility..."
   cards?: OptionCard[];
+  sellerName?: string | null; // For dynamic button text
+  meetingLink?: string | null; // Link to meeting scheduler
 }
 
 /**
@@ -142,6 +148,9 @@ export interface SocialProofItem {
  */
 export interface SocialProofs {
   items?: SocialProofItem[];
+  buyerName?: string | null; // For dynamic headline
+  sellerName?: string | null; // For dynamic headline
+  readMoreLink?: string | null; // Link to seller's read more page
 }
 
 /**
@@ -150,6 +159,8 @@ export interface SocialProofs {
 export interface SecondaryBenefit {
   title?: string | null;
   body?: string | null;
+  link?: string | null; // Link to learn more
+  sellerName?: string | null; // For dynamic button text
 }
 
 /**
@@ -197,11 +208,16 @@ export interface NormalizedContent {
  * Raw JSON input structure (as provided by sellers)
  */
 export interface RawLandingContent {
+  // Company names (required fields)
+  BuyersName: string;
+  SellersName: string;
+
   // Required fields
   biggestBusinessBenefitBuyerStatement: string;
 
   // Hero/Meta fields
   synopsisBusinessBenefit?: string;
+  shortDescriptionBusinessBenefit?: string; // Additional hero description
   meetingSchedulerLink?: string;
   sellerLinkWebsite?: string;
   quickDemoLinks?: string;
@@ -216,6 +232,7 @@ export interface RawLandingContent {
   };
 
   // Options
+  synopsisAutomationOptions?: string; // Section intro text
   options?: Array<{
     title: string;
     description?: string;
@@ -225,15 +242,11 @@ export interface RawLandingContent {
   mostRelevantProof?: {
     title?: string;
     summaryTitle?: string;
-    summaryBody?: string;
-    quote?: {
-      text?: string;
-      attribution?: {
-        name?: string;
-        role?: string;
-        company?: string;
-      };
-    };
+    summaryContent?: string; // Match actual JSON field name
+    quoteContent?: string; // Top-level quote field
+    quoteAuthorFullname?: string; // Top-level attribution fields
+    quoteAuthorDesignation?: string;
+    quoteAuthorCompany?: string;
   };
 
   // Social Proofs

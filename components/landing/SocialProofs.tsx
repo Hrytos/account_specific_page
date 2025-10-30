@@ -25,23 +25,31 @@ export function SocialProofs({ social }: SocialProofsProps) {
     return null;
   }
 
+  // Generate dynamic headline
+  const headline = social.sellerName && social.buyerName
+    ? `${social.sellerName} has helped companies like ${social.buyerName} with similar needs`
+    : 'Trusted by Industry Leaders';
+
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section id="social-proofs-section" className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <h2 className="text-3xl md:text-4xl font-normal text-gray-900 text-center mb-16">
-          Trusted by Industry Leaders
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center mb-16 leading-tight">
+          {headline}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {social.items.map((item, index) => (
-            <div
+            <a
               key={index}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors"
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 block"
             >
-              {/* Type label */}
+              {/* Type badge */}
               {item.type && (
-                <div className="mb-3">
-                  <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">
+                <div className="mb-4">
+                  <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider rounded-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     {item.type}
                   </span>
                 </div>
@@ -49,38 +57,58 @@ export function SocialProofs({ social }: SocialProofsProps) {
 
               {/* Description */}
               {item.description && (
-                <p className="text-gray-700 leading-relaxed mb-4">
+                <h3 className="text-lg font-bold text-gray-900 leading-snug mb-6 min-h-[60px]">
                   {item.description}
-                </p>
+                </h3>
               )}
 
-              {/* Link */}
-              {item.link && (
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm"
+              {/* Link indicator */}
+              <div className="flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-700">
+                <span>Learn more</span>
+                <svg
+                  className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
                 >
-                  Read more here
-                  <svg
-                    className="ml-2 w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-              )}
-            </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </div>
+            </a>
           ))}
         </div>
+
+        {/* Read More Button */}
+        {social.readMoreLink && (
+          <div className="mt-12 text-center">
+            <a
+              href={social.readMoreLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg rounded-xl border-2 border-gray-300 hover:border-blue-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+            >
+              Read More
+              <svg
+                className="ml-3 w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

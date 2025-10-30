@@ -25,6 +25,8 @@ export default function TestPhase1Page() {
     try {
       // Sample raw data
       const sampleRaw: RawLandingContent = {
+        BuyersName: 'Acme Corporation',
+        SellersName: 'TechFlow Solutions',
         biggestBusinessBenefitBuyerStatement: 'Reduce operational costs by 40% with AI-powered automation',
         synopsisBusinessBenefit: 'Transform your business operations with cutting-edge AI automation.',
         meetingSchedulerLink: 'https://calendly.com/example-meeting',
