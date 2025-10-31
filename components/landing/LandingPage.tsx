@@ -10,6 +10,8 @@
  * - Studio flow: Paste → Validate → Normalize → Preview (optional draft save to landing_pages with status draft/validated).
  */
 
+'use client';
+
 import type { NormalizedContent } from '@/lib/normalize/normalized.types';
 import {
   Hero,

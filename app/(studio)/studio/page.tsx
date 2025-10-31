@@ -20,11 +20,14 @@ import { useState, useRef } from 'react';
 import { validateAndNormalize, type ValidationResult } from '@/lib/validate';
 import { LandingPage } from '@/components/landing/LandingPage';
 import { suggestPageUrlKey } from '@/lib/util/slug';
+import { publishLanding, type PublishResult } from '@/lib/actions/publishLanding';
 
 export default function StudioPage() {
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [validating, setValidating] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Metadata fields for slug generation
@@ -114,6 +117,7 @@ export default function StudioPage() {
   const handleClearAll = () => {
     setJsonInput('');
     setValidationResult(null);
+    setPublishResult(null);
     setBuyerId('');
     setBuyerName('');
     setSellerId('');
@@ -122,6 +126,62 @@ export default function StudioPage() {
     setVersion('1');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handlePublish = async () => {
+    // Validation checks
+    if (!validationResult?.isValid || !validationResult.normalized) {
+      alert('Please validate your content first!');
+      return;
+    }
+
+    if (!suggestedSlug || !buyerId || !sellerId || !mmyy) {
+      alert('Please fill in all required metadata fields (Buyer ID, Seller ID, MMYY)!');
+      return;
+    }
+
+    setPublishing(true);
+    setPublishResult(null);
+
+    try {
+      // Get the studio publish secret from prompt (in production, this would be handled server-side)
+      const secret = prompt('Enter Studio Publish Secret:');
+      if (!secret) {
+        setPublishing(false);
+        return;
+      }
+
+      // Parse the original JSON input
+      const rawJson = JSON.parse(jsonInput);
+
+      // Prepare publish metadata
+      const meta = {
+        page_url_key: suggestedSlug,
+        buyer_id: buyerId,
+        seller_id: sellerId,
+        mmyy: mmyy,
+        buyer_name: buyerName || buyerId,
+        seller_name: sellerName || sellerId,
+      };
+
+      // Call the publish server action
+      const result = await publishLanding(rawJson, meta, secret);
+      setPublishResult(result);
+
+      // If successful, scroll to result
+      if (result.ok) {
+        setTimeout(() => {
+          document.getElementById('publish-result')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    } catch (error) {
+      setPublishResult({
+        ok: false,
+        error: `Publish failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -278,6 +338,98 @@ export default function StudioPage() {
             >
               {validating ? '⏳ Validating...' : '✅ Validate & Normalize'}
             </button>
+
+            <button
+              onClick={handlePublish}
+              disabled={publishing || !validationResult?.isValid || !suggestedSlug}
+              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
+            >
+              {publishing ? (
+                <>⏳ Publishing...</>
+              ) : (
+                <>🚀 Publish to Live</>
+              )}
+            </button>
+
+            {/* Publish Result */}
+            {publishResult && (
+              <div id="publish-result" className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                  📡 Publish Result
+                </h3>
+
+                {publishResult.ok ? (
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg font-semibold bg-green-100 border border-green-300 text-green-800">
+                      {publishResult.changed ? '✅ Published Successfully!' : '✅ Already Published (No Changes)'}
+                    </div>
+
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-xs font-medium text-blue-900 mb-2">
+                        🔗 Live URL:
+                      </div>
+                      <a
+                        href={publishResult.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 underline font-medium break-all"
+                      >
+                        {publishResult.url}
+                      </a>
+                    </div>
+
+                    {publishResult.contentSha && (
+                      <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-xs font-medium text-gray-700 mb-1">
+                          🔐 Content SHA-256:
+                        </div>
+                        <code className="text-xs text-gray-600 font-mono break-all">
+                          {publishResult.contentSha}
+                        </code>
+                      </div>
+                    )}
+
+                    {!publishResult.changed && (
+                      <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div className="text-sm text-yellow-800">
+                          ℹ️ The content is identical to the currently published version. No update was made.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg font-semibold bg-red-100 border border-red-300 text-red-800">
+                      ❌ Publish Failed
+                    </div>
+
+                    <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                      <div className="text-sm text-gray-800">
+                        {publishResult.error}
+                      </div>
+                    </div>
+
+                    {publishResult.validationErrors && publishResult.validationErrors.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="font-semibold text-red-700 text-sm">
+                          Validation Errors:
+                        </div>
+                        {publishResult.validationErrors.map((error, idx) => (
+                          <div key={idx} className="p-2 bg-red-50 rounded border border-red-200">
+                            <div className="text-xs text-gray-600">
+                              📍 {error.path}
+                            </div>
+                            <div className="text-sm text-gray-800 mt-1">
+                              {error.message}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Validation Results */}
             <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
