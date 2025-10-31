@@ -28,11 +28,11 @@ const MMYY_PATTERN = /^(0[1-9]|1[0-2])\d{2}$/;
 /**
  * Buyer/Seller ID pattern
  * Security: Prevents SQL injection and ensures safe identifiers
- * - Lowercase alphanumeric only
+ * - Alphanumeric (case-insensitive, will be normalized to lowercase)
  * - Hyphens allowed (but not leading/trailing)
  * - No special characters, spaces, or Unicode
  */
-const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ID_PATTERN = /^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$/;
 
 /**
  * Zod schema for publish metadata validation
@@ -48,17 +48,21 @@ export const PublishMetaSchema = z.object({
     .string()
     .min(1, 'buyer_id is required')
     .max(50, 'buyer_id must not exceed 50 characters')
-    .regex(ID_PATTERN, 'buyer_id must be lowercase alphanumeric with hyphens')
     .trim()
-    .toLowerCase(),
+    .transform(val => val.toLowerCase())
+    .refine(val => ID_PATTERN.test(val), {
+      message: 'buyer_id must be alphanumeric with hyphens (will be normalized to lowercase)',
+    }),
   
   seller_id: z
     .string()
     .min(1, 'seller_id is required')
     .max(50, 'seller_id must not exceed 50 characters')
-    .regex(ID_PATTERN, 'seller_id must be lowercase alphanumeric with hyphens')
     .trim()
-    .toLowerCase(),
+    .transform(val => val.toLowerCase())
+    .refine(val => ID_PATTERN.test(val), {
+      message: 'seller_id must be alphanumeric with hyphens (will be normalized to lowercase)',
+    }),
   
   mmyy: z
     .string()

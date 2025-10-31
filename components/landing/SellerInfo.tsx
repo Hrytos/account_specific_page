@@ -32,10 +32,10 @@ export function SellerInfo({ seller }: SellerInfoProps) {
           {/* Left Side - About Us Content */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                 About Us
               </h2>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
+              <div className="w-24 h-1.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"></div>
             </div>
 
             {seller.body && (

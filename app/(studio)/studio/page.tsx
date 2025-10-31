@@ -90,7 +90,10 @@ export default function StudioPage() {
     reader.readAsText(file);
   };
 
-  const handleOpenInNewTab = () => {
+  const handleOpenInNewTab = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent any default behavior
+    e.stopPropagation(); // Stop event bubbling
+    
     if (!validationResult?.isValid || !validationResult.normalized) {
       alert('Please validate your content first!');
       return;

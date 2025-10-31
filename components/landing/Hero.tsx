@@ -36,13 +36,16 @@ export function Hero({ hero }: HeroProps) {
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
       
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        {/* Headline - Centered at top */}
+        <div className="text-center mb-12 lg:mb-16">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight max-w-5xl mx-auto">
+            {headline}
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Text Content - Left Column */}
           <div className="space-y-8 lg:pr-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-              {headline}
-            </h1>
-
             {subhead && (
               <div className="space-y-4 text-lg md:text-xl text-gray-600 leading-relaxed">
                 {subhead.split('\n\n').map((paragraph, idx) => (
