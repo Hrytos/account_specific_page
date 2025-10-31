@@ -7,6 +7,7 @@ A powerful, JSON-driven landing page generator built with Next.js 16, React 19, 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [What's New in Part B](#whats-new-in-part-b)
 - [Architecture](#architecture)
 - [Core Concepts](#core-concepts)
 - [Data Flow](#data-flow)
@@ -19,6 +20,50 @@ A powerful, JSON-driven landing page generator built with Next.js 16, React 19, 
 - [API Reference](#api-reference)
 - [Development Workflow](#development-workflow)
 - [Best Practices](#best-practices)
+- [Part B Documentation](#part-b-documentation)
+
+---
+
+## 🚨 What's New in Part B
+
+**Multi-Tenant Publishing System** is now live! 🎉
+
+Part B extends the core landing page generator with production-ready features:
+
+### 🚀 Publishing Features
+
+- **One-Click Publish**: Studio UI → Server Action → Database → Live URL
+- **Database Persistence**: Supabase PostgreSQL with ACID compliance
+- **Content Versioning**: SHA-256 fingerprinting for idempotent publishes
+- **On-Demand ISR**: Only changed pages regenerate (sub-second updates)
+- **Multi-Tenant Support**: Multiple companies publish to same platform
+
+### 🔒 Security Features
+
+- **Timing-Safe Authentication**: Prevents timing attacks on secrets
+- **Input Sanitization**: All user inputs validated with Zod schemas
+- **SQL Injection Prevention**: Strict regex patterns + parameterized queries
+- **Error Message Sanitization**: Detailed in dev, generic in production
+- **Fetch Timeout Protection**: 5-second AbortController prevents hanging
+
+### ⚡ Performance
+
+- **First Publish**: 400-600ms (validation + DB write + revalidate)
+- **Idempotent Publish**: 150-250ms (early return, no DB write)
+- **Page Load (Cached)**: 50-200ms (ISR served from CDN edge)
+- **Throttling**: 15-second window prevents publish spam
+
+### 📚 Full Documentation
+
+See **[README_PART_B.md](./README_PART_B.md)** for complete multi-tenant publishing documentation:
+- Environment setup (5 required variables)
+- Database schema and migrations
+- Publishing flow (10-step process)
+- Testing & validation procedures
+- Deployment guide (Vercel + Supabase)
+- Troubleshooting common issues
+- Security best practices
+- Rollback procedures
 
 ---
 
@@ -32,11 +77,14 @@ Landing Page Studio is a sophisticated platform that enables rapid creation of h
 
 - ✅ **Zero Code Deployment**: Create landing pages by pasting JSON
 - ✅ **Multi-Company Support**: Dynamic content for buyer-seller relationships
+- ✅ **One-Click Publishing**: Studio → Database → Live URL in <600ms (Part B)
 - ✅ **Validation & Quality Control**: Comprehensive error checking and warnings
 - ✅ **SEO Optimized**: Built-in meta tags, performance optimization
 - ✅ **Type-Safe**: Full TypeScript coverage with strict validation
 - ✅ **Deterministic Output**: SHA-256 content fingerprinting for version control
 - ✅ **Responsive Design**: Mobile-first, Tailwind CSS powered UI
+- ✅ **Production-Ready Security**: Timing-safe auth, input sanitization, SQL injection prevention (Part B)
+- ✅ **On-Demand ISR**: Cache revalidation only for changed pages (Part B)
 
 ---
 
@@ -427,6 +475,7 @@ All sections use **null-rendering** - they auto-hide when data is empty.
 
 ## 🌟 Features
 
+### Part A: Core Landing Page Generator
 - ✅ Multi-company template support
 - ✅ Comprehensive validation (errors + warnings)
 - ✅ Content normalization & sanitization
@@ -437,6 +486,18 @@ All sections use **null-rendering** - they auto-hide when data is empty.
 - ✅ WCAG AA contrast checking
 - ✅ Dynamic CTA generation
 - ✅ Vimeo video embedding
+
+### Part B: Multi-Tenant Publishing (NEW!)
+- ✅ One-click publish from Studio UI
+- ✅ Supabase database persistence
+- ✅ On-demand ISR cache revalidation
+- ✅ Idempotent publishes (SHA-based)
+- ✅ Production-ready security hardening
+- ✅ Global slug-based URL scheme (`/p/{slug}`)
+- ✅ Server actions with timing-safe auth
+- ✅ Structured logging for monitoring
+- ✅ Throttling (15s window per slug)
+- ✅ Vercel deployment ready
 
 ---
 
@@ -471,17 +532,52 @@ Generates SEO-friendly URL slug.
 - Use HTTPS for all URLs
 - Keep headlines under 90 characters
 - Use Vimeo for videos
-- Test in Studio before deployment
+- Test in Studio before publishing (Part A validation)
+- Keep JSON in version control (Git)
+- Follow slug naming: `{buyer}-{seller}-{mmyy}` (Part B)
 
 ❌ **DON'T:**
 - Use HTTP URLs
 - Exceed hard text limits
 - Omit required fields
 - Include sensitive data
+- Publish without validating in Studio preview (Part B)
+- Use special characters in slugs (Part B)
 
 ---
 
-## 📄 License
+## � Part B Documentation
+
+For complete multi-tenant publishing system documentation, see:
+
+### **[README_PART_B.md](./README_PART_B.md)**
+
+Comprehensive guide covering:
+- 🏗️ Architecture overview
+- ⚙️ Environment setup (5 required variables)
+- 🗄️ Database schema and migrations
+- 🛣️ Routes & endpoints (Studio, public pages, revalidate API)
+- 📤 Publishing flow (10-step process with diagrams)
+- ✅ Testing & validation procedures
+- 🚀 Deployment guide (Vercel + Supabase)
+- 🔍 Troubleshooting common issues
+- 🔒 Security considerations and best practices
+- ⚡ Performance optimization techniques
+- 🔄 Rollback procedures
+
+### Quick Links
+
+| Topic | File | Description |
+|-------|------|-------------|
+| **Part A Core** | [README.md](./README.md) | This file - JSON validation, normalization, components |
+| **Part B Publishing** | [README_PART_B.md](./README_PART_B.md) | Multi-tenant publishing system |
+| **Implementation Plan** | [PART_B_Phase_Execution](./docs/PART_B_Phase_Execution_with_Copilot_Prompts_MultiTenant.md) | Phase-by-phase execution guide |
+| **Security Audit** | [Production Readiness](./docs/PRODUCTION_READINESS_REVIEW.md) | Security audit and recommendations |
+| **Phase Summaries** | [docs/phase-doc/](./docs/phase-doc/) | Detailed phase completion docs |
+
+---
+
+## �📄 License
 
 Proprietary software owned by **Hrytos**.
 
@@ -494,8 +590,10 @@ Built with Next.js 16, React 19, TypeScript 5, and Tailwind CSS 4.
 ---
 
 **Last Updated**: October 31, 2025  
-**Version**: 0.1.0  
-**Status**: Part A Complete ✅
+**Version**: 1.0.0  
+**Status**: Part A + Part B Complete ✅🚀
+
+**Production Ready**: Multi-tenant publishing system with security hardening
 
 ---
 
