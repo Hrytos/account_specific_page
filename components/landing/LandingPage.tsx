@@ -32,20 +32,22 @@ export interface LandingPageProps {
  * Complete Landing Page component
  * Renders all sections from normalized content
  * Sections auto-skip if their data is empty (no visual gaps)
+ * 
+ * Note: Analytics wrapper is handled by the parent page component
  */
 export function LandingPage({ content }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* SEO Meta - handled in page.tsx head */}
-      
-      <Hero hero={content.hero} />
-      <Benefits benefits={content.benefits} />
-      <Options options={content.options} />
-      <Proof proof={content.proof} />
-      <SocialProofs social={content.social} />
-      <SecondaryBenefit secondary={content.secondary} />
-      <SellerInfo seller={content.seller} />
-      <Footer footer={content.footer} brandLogoUrl={content.brand?.logoUrl} />
-    </div>
+        
+        <Hero hero={content.hero} />
+        <Benefits benefits={content.benefits} />
+        <Options options={content.options} />
+        <Proof proof={content.proof} />
+        <SocialProofs social={content.social} />
+        <SecondaryBenefit secondary={content.secondary} />
+        <SellerInfo seller={content.seller} />
+        <Footer footer={content.footer} brandLogoUrl={content.brand?.logoUrl} />
+      </div>
   );
 }

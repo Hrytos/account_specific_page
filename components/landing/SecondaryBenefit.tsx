@@ -11,6 +11,7 @@
  */
 
 import type { SecondaryBenefit as SecondaryBenefitType } from '@/lib/normalize/normalized.types';
+import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
 
 export interface SecondaryBenefitProps {
   secondary?: SecondaryBenefitType;
@@ -24,6 +25,9 @@ export function SecondaryBenefit({ secondary }: SecondaryBenefitProps) {
   if (!secondary || (!secondary.title && !secondary.body)) {
     return null;
   }
+
+  // Initialize hover telemetry for CTA engagement tracking
+  const hoverProps = useHoverTelemetry('secondary_cta', 'seller_section');
 
   const buttonText = secondary.sellerName 
     ? `Talk to ${secondary.sellerName}`
@@ -55,6 +59,13 @@ export function SecondaryBenefit({ secondary }: SecondaryBenefitProps) {
               href={secondary.link}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackCtaClick({
+                id: 'read_case_study',
+                location: 'seller_section',
+                href: secondary.link || '',
+                linkType: 'external'
+              })}
+              {...hoverProps}
               className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-blue-700 font-semibold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
             >
               {buttonText}

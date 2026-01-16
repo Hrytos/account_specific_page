@@ -12,6 +12,7 @@
 
 import type { Hero as HeroType } from '@/lib/normalize/normalized.types';
 import { parseVimeoId, getVimeoEmbedUrl } from '@/lib/normalize/vimeo';
+import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
 
 export interface HeroProps {
   hero: HeroType;
@@ -25,6 +26,9 @@ export function Hero({ hero }: HeroProps) {
   if (!hero || !hero.headline) {
     return null;
   }
+
+  // Initialize hover telemetry for engagement tracking
+  const hoverProps = useHoverTelemetry('hero_cta', 'hero');
 
   const { headline, subhead, shortDescription, cta, media } = hero;
   const videoUrl = media?.videoUrl;
@@ -84,6 +88,12 @@ export function Hero({ hero }: HeroProps) {
                     href={videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackCtaClick({
+                      id: 'read_case_study',
+                      location: 'hero',
+                      href: videoUrl,
+                      linkType: 'external'
+                    })}
                     className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <svg className="mr-2 w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -104,6 +114,13 @@ export function Hero({ hero }: HeroProps) {
               href={cta.href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackCtaClick({
+                id: 'book_meeting',
+                location: 'hero',
+                href: cta.href,
+                linkType: cta.href.startsWith('http') ? 'external' : 'internal'
+              })}
+              {...hoverProps}
               className="inline-flex items-center justify-center px-12 py-4 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 whitespace-nowrap"
             >
               {cta.text || 'Get Started'}
@@ -111,6 +128,12 @@ export function Hero({ hero }: HeroProps) {
             
             <button
               onClick={() => {
+                trackCtaClick({
+                  id: 'read_case_study',
+                  location: 'hero',
+                  href: '#benefits-section',
+                  linkType: 'internal'
+                });
                 const benefitsSection = document.getElementById('benefits-section');
                 benefitsSection?.scrollIntoView({ behavior: 'smooth' });
               }}
@@ -121,6 +144,12 @@ export function Hero({ hero }: HeroProps) {
             
             <button
               onClick={() => {
+                trackCtaClick({
+                  id: 'read_case_study',
+                  location: 'hero',
+                  href: '#options-section',
+                  linkType: 'internal'
+                });
                 const optionsSection = document.getElementById('options-section');
                 optionsSection?.scrollIntoView({ behavior: 'smooth' });
               }}
@@ -131,6 +160,12 @@ export function Hero({ hero }: HeroProps) {
             
             <button
               onClick={() => {
+                trackCtaClick({
+                  id: 'read_case_study',
+                  location: 'hero',
+                  href: '#social-proofs-section',
+                  linkType: 'internal'
+                });
                 const socialSection = document.getElementById('social-proofs-section');
                 socialSection?.scrollIntoView({ behavior: 'smooth' });
               }}

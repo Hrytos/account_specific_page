@@ -13,11 +13,13 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import {
   getPublishedContent,
+  getPublishedLanding,
   generateMetadataFromContent,
   type PublicRouteParams,
   getRouteSlug,
 } from '@/lib/db/publishedLanding';
 import { LandingPage } from '@/components/landing/LandingPage';
+import { AnalyticsPageWrapper } from '@/components/analytics/AnalyticsPageWrapper';
 
 /**
  * Generate dynamic metadata for SEO
@@ -48,13 +50,32 @@ export async function generateMetadata(
  */
 export default async function PublicLandingPage({ params }: PublicRouteParams) {
   const slug = await getRouteSlug(params);
-  const content = await getPublishedContent(slug);
+  
+  // Fetch both content and full landing page row for analytics context
+  const [content, landingPageRow] = await Promise.all([
+    getPublishedContent(slug),
+    getPublishedLanding(slug)
+  ]);
 
   // Return 404 if page not found or not published
-  if (!content) {
+  if (!content || !landingPageRow) {
     notFound();
   }
 
-  // Render the landing page using Part A components
-  return <LandingPage content={content} />;
+  // Extract analytics context from the landing page row
+  const pageProps = {
+    buyer_id: landingPageRow.buyer_id || 'unknown',
+    seller_id: landingPageRow.seller_id,
+    page_url_key: slug,
+    content_sha: landingPageRow.content_sha,
+    buyer_name: landingPageRow.buyer_name,
+    seller_name: landingPageRow.seller_name,
+  };
+
+  // Render the landing page with analytics wrapper
+  return (
+    <AnalyticsPageWrapper pageProps={pageProps}>
+      <LandingPage content={content} />
+    </AnalyticsPageWrapper>
+  );
 }

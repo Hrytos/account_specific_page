@@ -11,6 +11,7 @@
  */
 
 import type { SocialProofs as SocialProofsType } from '@/lib/normalize/normalized.types';
+import { trackCtaClick } from '@/lib/analytics/hooks';
 
 export interface SocialProofsProps {
   social?: SocialProofsType;
@@ -44,6 +45,12 @@ export function SocialProofs({ social }: SocialProofsProps) {
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackCtaClick({
+                id: 'read_case_study',
+                location: 'social_list',
+                href: item.link,
+                linkType: 'external'
+              })}
               className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 block"
             >
               {/* Type badge */}
@@ -90,6 +97,12 @@ export function SocialProofs({ social }: SocialProofsProps) {
               href={social.readMoreLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackCtaClick({
+                id: 'read_case_study',
+                location: 'social_list',
+                href: social.readMoreLink || '',
+                linkType: 'external'
+              })}
               className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg rounded-xl border-2 border-gray-300 hover:border-blue-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
             >
               Read More

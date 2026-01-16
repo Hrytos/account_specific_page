@@ -11,6 +11,7 @@
  */
 
 import type { Options as OptionsType } from '@/lib/normalize/normalized.types';
+import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
 
 export interface OptionsProps {
   options?: OptionsType;
@@ -24,6 +25,9 @@ export function Options({ options }: OptionsProps) {
   if (!options || !options.cards || options.cards.length === 0) {
     return null;
   }
+
+  // Initialize hover telemetry for CTA engagement tracking
+  const hoverProps = useHoverTelemetry('options_cta', 'proof_section');
 
   const buttonText = options.sellerName 
     ? `Talk to ${options.sellerName}`
@@ -67,6 +71,13 @@ export function Options({ options }: OptionsProps) {
                   href={options.meetingLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackCtaClick({
+                    id: 'book_meeting',
+                    location: 'proof_section',
+                    href: options.meetingLink || '',
+                    linkType: 'external'
+                  })}
+                  {...hoverProps}
                   className="block w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg text-center"
                 >
                   {buttonText}

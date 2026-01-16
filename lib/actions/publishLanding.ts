@@ -14,6 +14,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { validateAndNormalize } from '@/lib/validate';
 import { computeContentSha } from '@/lib/util/hash';
 import { validatePublishMeta, type PublishMeta } from '@/lib/validate/publishMeta';
+import { authorizeLandingPageUrl } from '@/lib/analytics/domainAuthorization';
 
 /**
  * In-memory throttle to prevent rapid re-publishes of the same slug
@@ -350,6 +351,23 @@ export async function publishLanding(
     
     const duration = Date.now() - startTime;
     const url = `${process.env.NEXT_PUBLIC_SITE_URL}/p/${slug}`;
+    
+    // 10. Automatically authorize the published landing page URL for PostHog analytics
+    try {
+      const authorized = await authorizeLandingPageUrl(slug);
+      if (authorized) {
+        console.info('[publishLanding] Landing page URL authorized for analytics', { slug, url });
+      } else {
+        console.warn('[publishLanding] Failed to authorize landing page URL for analytics', { slug, url });
+      }
+    } catch (authError) {
+      console.error('[publishLanding] Analytics domain authorization error', {
+        slug,
+        url,
+        error: authError,
+      });
+      // Don't fail the publish for authorization errors
+    }
     
     console.info('[publishLanding] Published successfully', {
       slug,
