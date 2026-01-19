@@ -19,8 +19,8 @@ import {
   type ErrorItem,
   type WarningItem,
 } from './errors';
-import { isHttpsUrl as isHttpsUrlUtil } from '@/lib/util/url';
-import { getContrastRatio, WCAG_CONTRAST } from '@/lib/util/contrast';
+import { isHttpsUrl as isHttpsUrlUtil } from '@/lib/utils/url';
+import { getContrastRatio, WCAG_CONTRAST } from '@/lib/utils/contrast';
 
 /**
  * LENGTH CAPS (soft targets, warnings only)

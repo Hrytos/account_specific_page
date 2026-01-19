@@ -14,6 +14,8 @@ import { Metadata } from 'next';
 import {
   getPublishedContent,
   getPublishedLanding,
+  getPublishedContentBySubdomain,
+  getPublishedLandingBySubdomain,
   generateMetadataFromContent,
   type PublicRouteParams,
   getRouteSlug,
@@ -22,14 +24,35 @@ import { LandingPage } from '@/components/landing/LandingPage';
 import { AnalyticsPageWrapper } from '@/components/analytics/AnalyticsPageWrapper';
 
 /**
+ * Extended route params that include searchParams for subdomain routing
+ */
+interface ExtendedRouteParams extends PublicRouteParams {
+  searchParams?: Promise<{ _subdomain?: string; _subdomain_route?: string }>;
+}
+
+/**
  * Generate dynamic metadata for SEO
- * Called by Next.js before rendering the page
+ * Supports both subdomain and path routing
  */
 export async function generateMetadata(
-  { params }: PublicRouteParams
+  { params, searchParams }: ExtendedRouteParams
 ): Promise<Metadata> {
   const slug = await getRouteSlug(params);
-  const content = await getPublishedContent(slug);
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const subdomain = resolvedSearchParams?._subdomain;
+  const isSubdomainRoute = resolvedSearchParams?._subdomain_route === 'true';
+  
+  let content = null;
+  
+  // Priority 1: Subdomain lookup (if coming from wildcard domain)
+  if (subdomain && isSubdomainRoute) {
+    content = await getPublishedContentBySubdomain(subdomain);
+  }
+  
+  // Priority 2: Slug-based lookup (backward compatibility)
+  if (!content) {
+    content = await getPublishedContent(slug);
+  }
 
   if (!content) {
     return {
@@ -43,19 +66,42 @@ export async function generateMetadata(
 
 /**
  * Public landing page route
- * Serves published pages for any company/tenant
+ * Supports both:
+ * 1. Subdomain routing: adient.yourcompany.com
+ * 2. Path routing: yourcompany.com/p/adient-cyngn-1025
  * 
- * URL: /p/{slug}
- * Example: /p/adient-cyngn-1025
+ * URL Examples:
+ * - /p/adient-cyngn-1025 (path-based)
+ * - adient.yourcompany.com (subdomain-based)
  */
-export default async function PublicLandingPage({ params }: PublicRouteParams) {
+export default async function PublicLandingPage({ params, searchParams }: ExtendedRouteParams) {
   const slug = await getRouteSlug(params);
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const subdomain = resolvedSearchParams?._subdomain;
+  const isSubdomainRoute = resolvedSearchParams?._subdomain_route === 'true';
   
-  // Fetch both content and full landing page row for analytics context
-  const [content, landingPageRow] = await Promise.all([
-    getPublishedContent(slug),
-    getPublishedLanding(slug)
-  ]);
+  let landingPageRow = null;
+  let content = null;
+  
+  // Priority 1: Subdomain lookup (if coming from wildcard domain)
+  if (subdomain && isSubdomainRoute) {
+    landingPageRow = await getPublishedLandingBySubdomain(subdomain);
+    if (landingPageRow) {
+      content = await getPublishedContentBySubdomain(subdomain);
+    }
+  }
+  
+  // Priority 2: Slug-based lookup (backward compatibility or direct path access)
+  if (!content) {
+    const [slugContent, slugRow] = await Promise.all([
+      getPublishedContent(slug),
+      getPublishedLanding(slug)
+    ]);
+    content = slugContent;
+    if (!landingPageRow) {
+      landingPageRow = slugRow;
+    }
+  }
 
   // Return 404 if page not found or not published
   if (!content || !landingPageRow) {
@@ -66,10 +112,8 @@ export default async function PublicLandingPage({ params }: PublicRouteParams) {
   const pageProps = {
     buyer_id: landingPageRow.buyer_id || 'unknown',
     seller_id: landingPageRow.seller_id,
-    page_url_key: slug,
+    page_url_key: landingPageRow.page_url_key,
     content_sha: landingPageRow.content_sha,
-    buyer_name: landingPageRow.buyer_name,
-    seller_name: landingPageRow.seller_name,
   };
 
   // Render the landing page with analytics wrapper

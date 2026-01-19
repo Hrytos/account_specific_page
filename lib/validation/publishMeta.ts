@@ -81,18 +81,6 @@ export const PublishMetaSchema = z.object({
   mmyy: z
     .string()
     .regex(MMYY_PATTERN, 'mmyy must be in MMYY format (e.g., "1025" for October 2025)'),
-  
-  buyer_name: z
-    .string()
-    .min(1, 'buyer_name is required')
-    .max(100, 'buyer_name must not exceed 100 characters')
-    .optional(),
-  
-  seller_name: z
-    .string()
-    .min(1, 'seller_name is required')
-    .max(100, 'seller_name must not exceed 100 characters')
-    .optional(),
 });
 
 /**

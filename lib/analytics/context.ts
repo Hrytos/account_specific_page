@@ -28,8 +28,6 @@ export interface PageProps {
   seller_id?: string;
   page_url_key: string;
   content_sha: string;
-  buyer_name?: string;
-  seller_name?: string;
 }
 
 /**
