@@ -11,6 +11,7 @@
  */
 
 import type { SellerInfo as SellerInfoType } from '@/lib/normalize/normalized.types';
+import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
 
 export interface SellerInfoProps {
   seller?: SellerInfoType;
@@ -24,6 +25,9 @@ export function SellerInfo({ seller }: SellerInfoProps) {
   if (!seller || (!seller.body && !seller.links?.primary && !seller.links?.more)) {
     return null;
   }
+
+  // Initialize hover telemetry for CTA engagement tracking
+  const hoverProps = useHoverTelemetry('seller_cta', 'seller_section');
 
   return (
     <section className="py-20 md:py-28 bg-gradient-to-br from-gray-50 to-white">
@@ -52,6 +56,13 @@ export function SellerInfo({ seller }: SellerInfoProps) {
                   href={seller.links.primary}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackCtaClick({
+                    id: 'visit_website',
+                    location: 'seller_section',
+                    href: seller.links?.primary || '',
+                    linkType: 'external'
+                  })}
+                  {...hoverProps}
                   className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
                 >
                   Visit Our Website

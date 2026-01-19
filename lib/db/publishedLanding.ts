@@ -17,7 +17,7 @@ export function getLandingCacheTag(slug: string): string {
 
 /**
  * Fetch a published landing page by slug with ISR cache tags
- * Returns null if not found or not published
+ * Returns null if not found, not published, or soft-deleted
  * 
  * Cache behavior:
  * - Tagged with "landing:{slug}"
@@ -33,6 +33,7 @@ export async function getPublishedLanding(slug: string): Promise<LandingPageRow 
     .select('*')
     .eq('page_url_key', slug)
     .eq('status', 'published')
+    .is('deleted_at', null) // NEW: Exclude soft-deleted records
     .single();
 
   if (error) {
@@ -49,6 +50,49 @@ export async function getPublishedLanding(slug: string): Promise<LandingPageRow 
   }
 
   return data as LandingPageRow;
+}
+
+/**
+ * Fetch a published landing page by subdomain (for Part D wildcard routing)
+ * Returns null if not found, not published, or soft-deleted
+ * 
+ * @param subdomain - The subdomain to fetch (e.g., 'adient')
+ * @returns Published landing page row or null
+ */
+export async function getPublishedLandingBySubdomain(
+  subdomain: string
+): Promise<LandingPageRow | null> {
+  const { data, error } = await supabaseAdmin
+    .from('landing_pages')
+    .select('*')
+    .eq('subdomain', subdomain)
+    .eq('status', 'published')
+    .is('deleted_at', null)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    console.error('[getPublishedLandingBySubdomain] Supabase error:', {
+      subdomain,
+      code: error.code,
+      message: error.message,
+    });
+    throw error;
+  }
+
+  return data as LandingPageRow;
+}
+
+/**
+ * Fetch content by subdomain (convenience function)
+ */
+export async function getPublishedContentBySubdomain(
+  subdomain: string
+): Promise<NormalizedContent | null> {
+  const row = await getPublishedLandingBySubdomain(subdomain);
+  return extractNormalizedContent(row);
 }
 
 /**

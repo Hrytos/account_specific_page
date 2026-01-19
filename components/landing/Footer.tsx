@@ -11,6 +11,7 @@
  */
 
 import type { Footer as FooterType } from '@/lib/normalize/normalized.types';
+import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
 
 export interface FooterProps {
   footer?: FooterType;
@@ -23,6 +24,9 @@ export interface FooterProps {
  */
 export function Footer({ footer, brandLogoUrl }: FooterProps) {
   const currentYear = new Date().getFullYear();
+
+  // Initialize hover telemetry for footer CTA engagement tracking
+  const hoverProps = useHoverTelemetry('footer_cta', 'footer');
 
   return (
     <footer className="bg-[#1a202c] text-white py-6">

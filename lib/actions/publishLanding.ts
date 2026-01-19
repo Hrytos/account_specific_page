@@ -11,9 +11,85 @@
 
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { validateAndNormalize } from '@/lib/validate';
-import { computeContentSha } from '@/lib/util/hash';
-import { validatePublishMeta, type PublishMeta } from '@/lib/validate/publishMeta';
+import { validateAndNormalize } from '@/lib/validation';
+import { computeContentSha } from '@/lib/utils/hash';
+import { validatePublishMeta } from '@/lib/validation/publishMeta';
+import { authorizeLandingPageUrl } from '@/lib/analytics/domainAuthorization';
+import { RESERVED_SUBDOMAINS, SUBDOMAIN_REGEX, THROTTLE_CONFIG } from '@/config/constants';
+import type { PublishResult, PublishMeta } from '@/lib/types';
+
+/**
+ * Validate subdomain format and check reserved names
+ * Returns error message if invalid, null if valid
+ */
+function validateSubdomain(subdomain: string): string | null {
+  // Check length
+  if (subdomain.length < 1 || subdomain.length > 63) {
+    return 'Subdomain must be 1-63 characters long';
+  }
+  
+  // Check format
+  if (!SUBDOMAIN_REGEX.test(subdomain)) {
+    return 'Subdomain must start and end with a letter or digit, and can only contain letters, digits, and hyphens';
+  }
+  
+  // Check reserved
+  if ((RESERVED_SUBDOMAINS as readonly string[]).includes(subdomain.toLowerCase())) {
+    return `Subdomain "${subdomain}" is reserved and cannot be used`;
+  }
+  
+  return null;
+}
+
+/**
+ * Check if subdomain is already taken by another page (excluding current page)
+ * Returns error message if conflict exists, null if available
+ */
+async function checkSubdomainConflict(
+  subdomain: string,
+  currentPageUrlKey: string
+): Promise<string | null> {
+  const { data, error } = await supabaseAdmin
+    .from('landing_pages')
+    .select('page_url_key, buyer_id')
+    .eq('subdomain', subdomain)
+    .is('deleted_at', null)
+    .neq('page_url_key', currentPageUrlKey)
+    .maybeSingle();
+  
+  if (error) {
+    console.error('[checkSubdomainConflict] Database error', { error });
+    return 'Failed to check subdomain availability';
+  }
+  
+  if (data) {
+    return `Subdomain "${subdomain}" is already used by another landing page (${data.buyer_id})`;
+  }
+  
+  return null;
+}
+
+/**
+ * Generate public URL based on subdomain or path
+ * If subdomain is provided, returns wildcard URL
+ * Otherwise, returns traditional path-based URL
+ */
+function generatePublicUrl(
+  pageUrlKey: string,
+  subdomain: string | null | undefined
+): string {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
+  if (subdomain) {
+    // Wildcard subdomain URL
+    const mainDomain = baseUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
+    const protocol = baseUrl.startsWith('https') ? 'https' : 'http';
+    return `${protocol}://${subdomain}.${mainDomain}`;
+  } else {
+    // Traditional path-based URL
+    return `${baseUrl}/p/${pageUrlKey}`;
+  }
+}
 
 /**
  * In-memory throttle to prevent rapid re-publishes of the same slug
@@ -23,31 +99,17 @@ import { validatePublishMeta, type PublishMeta } from '@/lib/validate/publishMet
  * is per-instance. For production, consider using Redis or similar.
  */
 const publishThrottle = new Map<string, number>();
-const THROTTLE_WINDOW_MS = 15_000; // 15 seconds
-const THROTTLE_CLEANUP_MS = 60_000; // Clean up after 1 minute
 
 // Clean up throttle map periodically to prevent memory leaks
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now();
     for (const [slug, timestamp] of publishThrottle.entries()) {
-      if (now - timestamp > THROTTLE_CLEANUP_MS) {
+      if (now - timestamp > THROTTLE_CONFIG.CLEANUP_MS) {
         publishThrottle.delete(slug);
       }
     }
-  }, THROTTLE_CLEANUP_MS);
-}
-
-/**
- * Result of a publish operation
- */
-export interface PublishResult {
-  ok: boolean;
-  url?: string;
-  contentSha?: string;
-  changed?: boolean;
-  error?: string;
-  validationErrors?: Array<{ path: string; message: string }>;
+  }, THROTTLE_CONFIG.CLEANUP_MS);
 }
 
 /**
@@ -58,7 +120,7 @@ function isThrottled(slug: string): boolean {
   if (!lastPublish) return false;
   
   const elapsed = Date.now() - lastPublish;
-  return elapsed < THROTTLE_WINDOW_MS;
+  return elapsed < THROTTLE_CONFIG.WINDOW_MS;
 }
 
 /**
@@ -173,11 +235,46 @@ export async function publishLanding(
     }
     
     const validMeta = metaResult.data as PublishMeta;
-    const slug = validMeta.page_url_key;
+    
+    // Auto-sync: page_url_key = subdomain (one buyer = one subdomain)
+    const slug = validMeta.subdomain;
+    validMeta.page_url_key = slug;
+    
+    // 2a. Validate subdomain
+    if (validMeta.subdomain) {
+      const subdomainError = validateSubdomain(validMeta.subdomain);
+      if (subdomainError) {
+        console.warn('[publishLanding] Invalid subdomain', {
+          slug,
+          subdomain: validMeta.subdomain,
+          error: subdomainError,
+        });
+        
+        return {
+          ok: false,
+          error: subdomainError,
+        };
+      }
+      
+      // Check for subdomain conflicts (also checks page_url_key since slug = subdomain)
+      const conflictError = await checkSubdomainConflict(validMeta.subdomain, slug);
+      if (conflictError) {
+        console.warn('[publishLanding] Subdomain conflict', {
+          slug,
+          subdomain: validMeta.subdomain,
+          error: conflictError,
+        });
+        
+        return {
+          ok: false,
+          error: conflictError,
+        };
+      }
+    }
     
     // 3. Check throttle
     if (isThrottled(slug)) {
-      const remaining = THROTTLE_WINDOW_MS - (Date.now() - (publishThrottle.get(slug) || 0));
+      const remaining = THROTTLE_CONFIG.WINDOW_MS - (Date.now() - (publishThrottle.get(slug) || 0));
       console.warn('[publishLanding] Throttled', { slug, remainingMs: remaining });
       
       return {
@@ -249,21 +346,26 @@ export async function publishLanding(
     
     // 7. Upsert to landing_pages table
     const now = new Date().toISOString();
+    const publicUrl = generatePublicUrl(slug, validMeta.subdomain);
+    
     const { error: upsertError } = await supabaseAdmin
       .from('landing_pages')
       .upsert(
         {
           page_url_key: slug,
+          campaign_id: validMeta.campaign_id || null,
+          subdomain: validMeta.subdomain || null,
+          page_url: publicUrl,                        // Store the full URL
           status: 'published',
-          page_content: { normalized }, // Store under 'normalized' key
+          page_content: { normalized },
           content_sha: contentSha,
           buyer_id: validMeta.buyer_id,
           seller_id: validMeta.seller_id,
           mmyy: validMeta.mmyy,
-          buyer_name: validMeta.buyer_name || validMeta.buyer_id,
-          seller_name: validMeta.seller_name || validMeta.seller_id,
           published_at: now,
-          version: 1, // Default version number
+          version: 1,
+          // Note: updated_at is auto-managed by trigger
+          // Note: deleted_at is NULL for active pages
         },
         {
           onConflict: 'page_url_key',
@@ -349,7 +451,24 @@ export async function publishLanding(
     updateThrottle(slug);
     
     const duration = Date.now() - startTime;
-    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/p/${slug}`;
+    const url = generatePublicUrl(slug, validMeta.subdomain);
+    
+    // 10. Automatically authorize the published landing page URL for PostHog analytics
+    try {
+      const authorized = await authorizeLandingPageUrl(slug);
+      if (authorized) {
+        console.info('[publishLanding] Landing page URL authorized for analytics', { slug, url });
+      } else {
+        console.warn('[publishLanding] Failed to authorize landing page URL for analytics', { slug, url });
+      }
+    } catch (authError) {
+      console.error('[publishLanding] Analytics domain authorization error', {
+        slug,
+        url,
+        error: authError,
+      });
+      // Don't fail the publish for authorization errors
+    }
     
     console.info('[publishLanding] Published successfully', {
       slug,

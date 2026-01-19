@@ -16,11 +16,12 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
-import { validateAndNormalize, type ValidationResult } from '@/lib/validate';
+import { useState, useRef, useEffect } from 'react';
+import { validateAndNormalize, type ValidationResult } from '@/lib/validation';
 import { LandingPage } from '@/components/landing/LandingPage';
-import { suggestPageUrlKey } from '@/lib/util/slug';
-import { publishLanding, type PublishResult } from '@/lib/actions/publishLanding';
+import { suggestPageUrlKey } from '@/lib/utils/slug';
+import { publishLanding } from '@/lib/actions/publishLanding';
+import type { PublishResult } from '@/lib/types';
 
 export default function StudioPage() {
   const [jsonInput, setJsonInput] = useState('');
@@ -30,23 +31,36 @@ export default function StudioPage() {
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Metadata fields for slug generation
+  // Metadata fields
   const [buyerId, setBuyerId] = useState('');
-  const [buyerName, setBuyerName] = useState('');
   const [sellerId, setSellerId] = useState('');
-  const [sellerName, setSellerName] = useState('');
   const [mmyy, setMmyy] = useState('');
-  const [version, setVersion] = useState('1');
+  const [subdomain, setSubdomain] = useState('');
+  const [campaignId, setCampaignId] = useState('');
+  const [campaigns, setCampaigns] = useState<Array<{id: string; name: string}>>([]);
 
-  // Calculate suggested page_url_key
-  const suggestedSlug = buyerId && sellerId && mmyy
-    ? suggestPageUrlKey(
-        buyerName || buyerId,
-        sellerName || sellerId,
-        mmyy,
-        parseInt(version) || 1
-      )
-    : null;
+  // Auto-generate subdomain from buyer ID
+  const suggestedSubdomain = buyerId
+    ? buyerId.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    : subdomain;
+
+  // Load campaigns on mount
+  useEffect(() => {
+    async function loadCampaigns() {
+      try {
+        const response = await fetch('/api/campaigns');
+        if (response.ok) {
+          const data = await response.json();
+          setCampaigns(data);
+        }
+      } catch (error) {
+        console.error('Failed to load campaigns:', error);
+        // Set a default campaign for testing
+        setCampaigns([{ id: 'test-campaign', name: 'Test Campaign' }]);
+      }
+    }
+    loadCampaigns();
+  }, []);
 
   const handleValidate = async () => {
     setValidating(true);
@@ -122,11 +136,10 @@ export default function StudioPage() {
     setValidationResult(null);
     setPublishResult(null);
     setBuyerId('');
-    setBuyerName('');
     setSellerId('');
-    setSellerName('');
     setMmyy('');
-    setVersion('1');
+    setSubdomain('');
+    setCampaignId('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -139,8 +152,8 @@ export default function StudioPage() {
       return;
     }
 
-    if (!suggestedSlug || !buyerId || !sellerId || !mmyy) {
-      alert('Please fill in all required metadata fields (Buyer ID, Seller ID, MMYY)!');
+    if (!subdomain || !buyerId || !sellerId || !mmyy) {
+      alert('Please fill in all required metadata fields (Subdomain, Buyer ID, Seller ID, MMYY)!');
       return;
     }
 
@@ -160,12 +173,11 @@ export default function StudioPage() {
 
       // Prepare publish metadata
       const meta = {
-        page_url_key: suggestedSlug,
+        subdomain: subdomain,
+        campaign_id: campaignId || null,
         buyer_id: buyerId,
         seller_id: sellerId,
         mmyy: mmyy,
-        buyer_name: buyerName || buyerId,
-        seller_name: sellerName || sellerId,
       };
 
       // Call the publish server action
@@ -209,25 +221,33 @@ export default function StudioPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Campaign *
+              </label>
+              <select
+                value={campaignId}
+                onChange={(e) => setCampaignId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
+              >
+                <option value="">Select a campaign</option>
+                {campaigns.map((campaign) => (
+                  <option key={campaign.id} value={campaign.id}>
+                    {campaign.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                💡 Tip: Create campaigns in your database first
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Buyer ID *
               </label>
               <input
                 type="text"
                 value={buyerId}
                 onChange={(e) => setBuyerId(e.target.value)}
-                placeholder="buyer-123"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Buyer Name
-              </label>
-              <input
-                type="text"
-                value={buyerName}
-                onChange={(e) => setBuyerName(e.target.value)}
-                placeholder="Acme Corp"
+                placeholder="adient"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
               />
             </div>
@@ -239,19 +259,7 @@ export default function StudioPage() {
                 type="text"
                 value={sellerId}
                 onChange={(e) => setSellerId(e.target.value)}
-                placeholder="seller-456"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Seller Name
-              </label>
-              <input
-                type="text"
-                value={sellerName}
-                onChange={(e) => setSellerName(e.target.value)}
-                placeholder="Widget Inc"
+                placeholder="cyngn"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
               />
             </div>
@@ -263,33 +271,37 @@ export default function StudioPage() {
                 type="text"
                 value={mmyy}
                 onChange={(e) => setMmyy(e.target.value)}
-                placeholder="0125"
+                placeholder="0126"
                 maxLength={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
               />
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Version
+                Subdomain * (buyer's personalized URL)
               </label>
               <input
-                type="number"
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400"
+                type="text"
+                value={subdomain}
+                onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
+                placeholder={suggestedSubdomain || "adient"}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400 font-mono"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Will be: <span className="font-mono">{subdomain || suggestedSubdomain || 'subdomain'}.yourcompany.com</span>
+              </p>
             </div>
           </div>
           
-          {suggestedSlug && (
+          {subdomain && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-sm font-medium text-blue-900">
-                🔗 Suggested URL Key:
+                🔗 Public URLs:
               </div>
-              <code className="text-sm text-blue-700 font-mono">
-                {suggestedSlug}
-              </code>
+              <div className="text-sm text-blue-700 font-mono space-y-1 mt-1">
+                <div>https://{subdomain}.yourcompany.com</div>
+                <div className="text-xs text-blue-600">OR: /p/{subdomain}</div>
+              </div>
             </div>
           )}
         </div>
@@ -344,7 +356,7 @@ export default function StudioPage() {
 
             <button
               onClick={handlePublish}
-              disabled={publishing || !validationResult?.isValid || !suggestedSlug}
+              disabled={publishing || !validationResult?.isValid || !subdomain}
               className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
             >
               {publishing ? (

@@ -48,25 +48,28 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRole, {
 
 /**
  * Type-safe database types for landing_pages table
+ * Updated to match new schema with campaign integration
  */
 export interface LandingPageRow {
   id?: string;
-  page_url_key: string;
+  campaign_id?: string | null;     // Foreign key to sl_campaigns
+  page_url_key: string;             // Required: Unique slug
+  subdomain?: string | null;        // Optional subdomain for wildcard routing
+  page_url?: string | null;         // Full URL to the landing page
   status: 'draft' | 'published' | 'archived';
   page_content: {
     normalized: any; // NormalizedContent from Part A
     original?: any; // Optional: store raw JSON for rollback
   };
   content_sha: string;
-  buyer_id?: string;
-  seller_id?: string;
+  buyer_id: string;                 // Required
+  seller_id: string;                // Required
   mmyy?: string;
-  buyer_name?: string;
-  seller_name?: string;
-  version?: number; // Version number for tracking iterations
-  published_at?: string; // ISO 8601 timestamp
-  created_at?: string;
-  updated_at?: string;
+  version?: number;
+  published_at?: string;            // ISO 8601 timestamp
+  created_at?: string;              // Auto-generated
+  updated_at?: string;              // Auto-updated via trigger
+  deleted_at?: string | null;       // Soft delete support
 }
 
 /**

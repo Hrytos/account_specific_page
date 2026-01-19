@@ -67,6 +67,58 @@ See **[README_PART_B.md](./README_PART_B.md)** for complete multi-tenant publish
 
 ---
 
+## 🌐 What's New in Part D
+
+**Wildcard Subdomain Routing** is now implemented! 🚀
+
+Part D adds enterprise-grade multi-tenant routing with custom subdomains:
+
+### 🎯 Routing Features
+
+- **Dual Routing System**: Both subdomain (adient.cyngn.com) AND path-based (/p/adient) work
+- **Wildcard DNS Support**: `*.yourcompany.com` routes all buyer subdomains
+- **Middleware-Based**: Automatic subdomain extraction and rewriting
+- **Reserved Subdomains**: Protection for www, api, admin, app, etc.
+- **Conflict Detection**: Validates subdomain uniqueness per buyer
+- **Auto-Sync**: page_url_key automatically equals subdomain for consistency
+
+### 🗄️ Schema Updates
+
+- **Removed**: buyer_name and seller_name columns (use IDs only)
+- **Added**: page_url column to store full landing page URLs
+- **Added**: campaign_id foreign key to sl_campaigns table
+- **Required**: subdomain field is now mandatory for published pages
+- **Campaign Integration**: Studio dropdown for campaign selection
+
+### 🔧 Technical Implementation
+
+- **middleware.ts**: Extracts subdomain from hostname, rewrites to /p/[slug] route
+- **Subdomain Validation**: DNS-safe regex pattern, reserved name checking
+- **Priority Routing**: Subdomain lookup first, falls back to path-based
+- **Conflict Checking**: Prevents duplicate subdomains across buyers
+- **URL Storage**: Full landing page URL saved to database on publish
+
+### 📦 Code Organization
+
+- **lib/validation/**: Renamed from lib/validate for consistency
+- **lib/utils/**: Renamed from lib/util for consistency
+- **lib/types/**: Centralized TypeScript type definitions
+- **config/**: Application constants (reserved subdomains, regex patterns)
+
+### 🚀 Deployment Requirements
+
+**Vercel Configuration**:
+- Add wildcard domain: `*.yourcompany.com`
+- Configure DNS CNAME: `* → cname.vercel-dns.com`
+
+**Database Migration**:
+```sql
+ALTER TABLE landing_pages ADD COLUMN page_url TEXT;
+ALTER TABLE landing_pages DROP COLUMN buyer_name, seller_name;
+```
+
+---
+
 ## 🎯 Overview
 
 ### What is Landing Page Studio?
@@ -78,6 +130,9 @@ Landing Page Studio is a sophisticated platform that enables rapid creation of h
 - ✅ **Zero Code Deployment**: Create landing pages by pasting JSON
 - ✅ **Multi-Company Support**: Dynamic content for buyer-seller relationships
 - ✅ **One-Click Publishing**: Studio → Database → Live URL in <600ms (Part B)
+- ✅ **Wildcard Subdomain Routing**: Each buyer gets their own subdomain (Part D)
+- ✅ **Dual Routing**: Both subdomain and path-based URLs work (Part D)
+- ✅ **Campaign Integration**: Link landing pages to marketing campaigns (Part D)
 - ✅ **Validation & Quality Control**: Comprehensive error checking and warnings
 - ✅ **SEO Optimized**: Built-in meta tags, performance optimization
 - ✅ **Type-Safe**: Full TypeScript coverage with strict validation
@@ -379,6 +434,18 @@ landing-page-studio/
 │       └── Footer.tsx                   # Footer
 │
 ├── lib/                                 # Core business logic
+│   ├── actions/                         # Server actions
+│   │   └── publishLanding.ts            # Publish action (Part B)
+│   │
+│   ├── analytics/                       # PostHog analytics (Part C)
+│   │   ├── context.ts                   # Context building
+│   │   ├── domainAuthorization.ts       # Domain auth
+│   │   └── hooks.ts                     # React hooks
+│   │
+│   ├── db/                              # Database layer (Part B)
+│   │   ├── supabase.ts                  # Client & types
+│   │   └── publishedLanding.ts          # Query functions
+│   │
 │   ├── normalize/                       # Normalization layer
 │   │   ├── normalized.types.ts          # TypeScript interfaces
 │   │   ├── mapRawToNormalized.ts        # Transformer
@@ -386,18 +453,28 @@ landing-page-studio/
 │   │   ├── stableStringify.ts           # JSON serialization
 │   │   └── vimeo.ts                     # Vimeo URL parsing
 │   │
-│   ├── validate/                        # Validation layer
+│   ├── validation/                      # Validation layer (Part D)
 │   │   ├── index.ts                     # Main validator
 │   │   ├── rules.ts                     # Validation rules
-│   │   └── errors.ts                    # Error types
+│   │   ├── errors.ts                    # Error types
+│   │   └── publishMeta.ts               # Publish metadata validation
 │   │
-│   ├── util/                            # Utility functions
+│   ├── utils/                           # Utility functions (Part D)
 │   │   ├── slug.ts                      # Slug generation
 │   │   ├── url.ts                       # URL validation
-│   │   └── contrast.ts                  # WCAG contrast
+│   │   ├── contrast.ts                  # WCAG contrast
+│   │   └── hash.ts                      # Hash utilities
+│   │
+│   ├── types/                           # Centralized types (Part D)
+│   │   └── index.ts                     # Type exports
 │   │
 │   └── theme/
 │       └── tokens.ts                    # Design tokens
+│
+├── config/                              # Application config (Part D)
+│   └── constants.ts                     # Constants (reserved subdomains, regex)
+│
+├── middleware.ts                        # Subdomain routing (Part D)
 │
 ├── fixtures/
 │   └── sample.json                      # Sample JSON
@@ -487,7 +564,7 @@ All sections use **null-rendering** - they auto-hide when data is empty.
 - ✅ Dynamic CTA generation
 - ✅ Vimeo video embedding
 
-### Part B: Multi-Tenant Publishing (NEW!)
+### Part B: Multi-Tenant Publishing
 - ✅ One-click publish from Studio UI
 - ✅ Supabase database persistence
 - ✅ On-demand ISR cache revalidation
@@ -498,6 +575,19 @@ All sections use **null-rendering** - they auto-hide when data is empty.
 - ✅ Structured logging for monitoring
 - ✅ Throttling (15s window per slug)
 - ✅ Vercel deployment ready
+
+### Part D: Wildcard Subdomain Routing (NEW!)
+- ✅ Wildcard DNS support (`*.yourcompany.com`)
+- ✅ Middleware-based subdomain extraction
+- ✅ Dual routing (subdomain + path-based)
+- ✅ Reserved subdomain protection
+- ✅ Subdomain conflict detection
+- ✅ Auto-sync page_url_key = subdomain
+- ✅ Campaign integration with foreign key
+- ✅ Campaign selection dropdown in Studio
+- ✅ URL storage in database (page_url column)
+- ✅ Streamlined schema (removed buyer_name/seller_name)
+- ✅ DNS-safe subdomain validation
 
 ---
 
@@ -571,6 +661,8 @@ Comprehensive guide covering:
 |-------|------|-------------|
 | **Part A Core** | [README.md](./README.md) | This file - JSON validation, normalization, components |
 | **Part B Publishing** | [README_PART_B.md](./README_PART_B.md) | Multi-tenant publishing system |
+| **Part D Subdomains** | [PART_D_Wildcard_Subdomains_Implementation.md](./docs/PART_D_Wildcard_Subdomains_Implementation.md) | Wildcard subdomain routing guide |
+| **Schema Changes** | [SCHEMA_UPDATE_CHANGELOG.md](./docs/SCHEMA_UPDATE_CHANGELOG.md) | Database schema update history |
 | **Implementation Plan** | [PART_B_Phase_Execution](./docs/PART_B_Phase_Execution_with_Copilot_Prompts_MultiTenant.md) | Phase-by-phase execution guide |
 | **Security Audit** | [Production Readiness](./docs/PRODUCTION_READINESS_REVIEW.md) | Security audit and recommendations |
 | **Phase Summaries** | [docs/phase-doc/](./docs/phase-doc/) | Detailed phase completion docs |
@@ -589,11 +681,11 @@ Built with Next.js 16, React 19, TypeScript 5, and Tailwind CSS 4.
 
 ---
 
-**Last Updated**: October 31, 2025  
-**Version**: 1.0.0  
-**Status**: Part A + Part B Complete ✅🚀
+**Last Updated**: January 19, 2026  
+**Version**: 1.2.0  
+**Status**: Part A + Part B + Part D Complete ✅🚀
 
-**Production Ready**: Multi-tenant publishing system with security hardening
+**Production Ready**: Multi-tenant publishing system with wildcard subdomain routing and security hardening
 
 ---
 
