@@ -19,24 +19,23 @@ import { THROTTLE_CONFIG } from '@/config/constants';
 import type { PublishResult, PublishMeta } from '@/lib/types';
 
 /**
- * Generate public URL based on seller_domain
- * Format: https://{buyer_id}.{seller_domain}
+ * Generate public URL using path-based routing
+ * Format: https://{seller_domain}/p/{page_url_key}
  */
 function generatePublicUrl(
   buyerId: string,
   sellerDomain: string | null | undefined,
   pageUrlKey: string
 ): string {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  
+  // Path-based URL: seller_domain/p/slug
   if (sellerDomain) {
-    // Wildcard domain URL: buyer_id.seller_domain
     const protocol = sellerDomain.includes('localhost') ? 'http' : 'https';
-    return `${protocol}://${buyerId}.${sellerDomain}`;
-  } else {
-    // Traditional path-based URL (fallback)
-    return `${baseUrl}/p/${pageUrlKey}`;
+    return `${protocol}://${sellerDomain}/p/${pageUrlKey}`;
   }
+  
+  // Fallback to NEXT_PUBLIC_SITE_URL if no seller_domain
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  return `${baseUrl}/p/${pageUrlKey}`;
 }
 
 /**
