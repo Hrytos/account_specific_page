@@ -283,18 +283,18 @@ export default function StudioPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400 font-mono"
               />
               <p className="mt-1 text-xs text-gray-500">
-                URL will be: <span className="font-mono">{buyerId || 'buyer-id'}.{sellerDomain || 'seller-domain.com'}</span>
+                URL will be: <span className="font-mono">{sellerDomain || 'seller-domain.com'}/p/{buyerId || 'buyer-id'}-{sellerId || 'seller-id'}-{mmyy || 'MMYY'}</span>
               </p>
             </div>
           </div>
           
-          {sellerDomain && buyerId && (
+          {sellerDomain && buyerId && sellerId && mmyy && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-sm font-medium text-blue-900">
                 🔗 Public URL:
               </div>
               <div className="text-sm text-blue-700 font-mono space-y-1 mt-1">
-                <div>https://{buyerId}.{sellerDomain}</div>
+                <div>https://{sellerDomain}/p/{buyerId}-{sellerId}-{mmyy}</div>
               </div>
             </div>
           )}
