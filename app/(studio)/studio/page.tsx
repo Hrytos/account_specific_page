@@ -35,14 +35,9 @@ export default function StudioPage() {
   const [buyerId, setBuyerId] = useState('');
   const [sellerId, setSellerId] = useState('');
   const [mmyy, setMmyy] = useState('');
-  const [subdomain, setSubdomain] = useState('');
+  const [sellerDomain, setSellerDomain] = useState('');
   const [campaignId, setCampaignId] = useState('');
   const [campaigns, setCampaigns] = useState<Array<{id: string; name: string}>>([]);
-
-  // Auto-generate subdomain from buyer ID
-  const suggestedSubdomain = buyerId
-    ? buyerId.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
-    : subdomain;
 
   // Load campaigns on mount
   useEffect(() => {
@@ -138,7 +133,7 @@ export default function StudioPage() {
     setBuyerId('');
     setSellerId('');
     setMmyy('');
-    setSubdomain('');
+    setSellerDomain('');
     setCampaignId('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -152,8 +147,8 @@ export default function StudioPage() {
       return;
     }
 
-    if (!subdomain || !buyerId || !sellerId || !mmyy) {
-      alert('Please fill in all required metadata fields (Subdomain, Buyer ID, Seller ID, MMYY)!');
+    if (!sellerDomain || !buyerId || !sellerId || !mmyy) {
+      alert('Please fill in all required metadata fields (Seller Domain, Buyer ID, Seller ID, MMYY)!');
       return;
     }
 
@@ -173,7 +168,7 @@ export default function StudioPage() {
 
       // Prepare publish metadata
       const meta = {
-        subdomain: subdomain,
+        seller_domain: sellerDomain,
         campaign_id: campaignId || null,
         buyer_id: buyerId,
         seller_id: sellerId,
@@ -278,29 +273,28 @@ export default function StudioPage() {
             </div>
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Subdomain * (buyer's personalized URL)
+                Seller Domain * (e.g., cyngn.com, techflow.io)
               </label>
               <input
                 type="text"
-                value={subdomain}
-                onChange={(e) => setSubdomain(e.target.value.toLowerCase())}
-                placeholder={suggestedSubdomain || "adient"}
+                value={sellerDomain}
+                onChange={(e) => setSellerDomain(e.target.value.toLowerCase())}
+                placeholder="cyngn.com"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder:text-gray-400 font-mono"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Will be: <span className="font-mono">{subdomain || suggestedSubdomain || 'subdomain'}.yourcompany.com</span>
+                URL will be: <span className="font-mono">{buyerId || 'buyer-id'}.{sellerDomain || 'seller-domain.com'}</span>
               </p>
             </div>
           </div>
           
-          {subdomain && (
+          {sellerDomain && buyerId && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-sm font-medium text-blue-900">
-                🔗 Public URLs:
+                🔗 Public URL:
               </div>
               <div className="text-sm text-blue-700 font-mono space-y-1 mt-1">
-                <div>https://{subdomain}.yourcompany.com</div>
-                <div className="text-xs text-blue-600">OR: /p/{subdomain}</div>
+                <div>https://{buyerId}.{sellerDomain}</div>
               </div>
             </div>
           )}
@@ -356,7 +350,7 @@ export default function StudioPage() {
 
             <button
               onClick={handlePublish}
-              disabled={publishing || !validationResult?.isValid || !subdomain}
+              disabled={publishing || !validationResult?.isValid || !sellerDomain || !buyerId}
               className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
             >
               {publishing ? (

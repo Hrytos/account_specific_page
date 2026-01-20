@@ -53,19 +53,22 @@ export async function getPublishedLanding(slug: string): Promise<LandingPageRow 
 }
 
 /**
- * Fetch a published landing page by subdomain (for Part D wildcard routing)
+ * Fetch a published landing page by buyer_id and seller_domain (for wildcard routing)
  * Returns null if not found, not published, or soft-deleted
  * 
- * @param subdomain - The subdomain to fetch (e.g., 'adient')
+ * @param buyerId - The buyer identifier (e.g., 'adient')
+ * @param sellerDomain - The seller's domain (e.g., 'cyngn.com')
  * @returns Published landing page row or null
  */
-export async function getPublishedLandingBySubdomain(
-  subdomain: string
+export async function getPublishedLandingByDomain(
+  buyerId: string,
+  sellerDomain: string
 ): Promise<LandingPageRow | null> {
   const { data, error } = await supabaseAdmin
     .from('landing_pages')
     .select('*')
-    .eq('subdomain', subdomain)
+    .eq('buyer_id', buyerId)
+    .eq('seller_domain', sellerDomain)
     .eq('status', 'published')
     .is('deleted_at', null)
     .single();
@@ -74,8 +77,9 @@ export async function getPublishedLandingBySubdomain(
     if (error.code === 'PGRST116') {
       return null;
     }
-    console.error('[getPublishedLandingBySubdomain] Supabase error:', {
-      subdomain,
+    console.error('[getPublishedLandingByDomain] Supabase error:', {
+      buyerId,
+      sellerDomain,
       code: error.code,
       message: error.message,
     });
@@ -86,12 +90,13 @@ export async function getPublishedLandingBySubdomain(
 }
 
 /**
- * Fetch content by subdomain (convenience function)
+ * Fetch content by buyer_id and seller_domain (convenience function)
  */
-export async function getPublishedContentBySubdomain(
-  subdomain: string
+export async function getPublishedContentByDomain(
+  buyerId: string,
+  sellerDomain: string
 ): Promise<NormalizedContent | null> {
-  const row = await getPublishedLandingBySubdomain(subdomain);
+  const row = await getPublishedLandingByDomain(buyerId, sellerDomain);
   return extractNormalizedContent(row);
 }
 

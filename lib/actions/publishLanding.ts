@@ -15,78 +15,26 @@ import { validateAndNormalize } from '@/lib/validation';
 import { computeContentSha } from '@/lib/utils/hash';
 import { validatePublishMeta } from '@/lib/validation/publishMeta';
 import { authorizeLandingPageUrl } from '@/lib/analytics/domainAuthorization';
-import { RESERVED_SUBDOMAINS, SUBDOMAIN_REGEX, THROTTLE_CONFIG } from '@/config/constants';
+import { THROTTLE_CONFIG } from '@/config/constants';
 import type { PublishResult, PublishMeta } from '@/lib/types';
 
 /**
- * Validate subdomain format and check reserved names
- * Returns error message if invalid, null if valid
- */
-function validateSubdomain(subdomain: string): string | null {
-  // Check length
-  if (subdomain.length < 1 || subdomain.length > 63) {
-    return 'Subdomain must be 1-63 characters long';
-  }
-  
-  // Check format
-  if (!SUBDOMAIN_REGEX.test(subdomain)) {
-    return 'Subdomain must start and end with a letter or digit, and can only contain letters, digits, and hyphens';
-  }
-  
-  // Check reserved
-  if ((RESERVED_SUBDOMAINS as readonly string[]).includes(subdomain.toLowerCase())) {
-    return `Subdomain "${subdomain}" is reserved and cannot be used`;
-  }
-  
-  return null;
-}
-
-/**
- * Check if subdomain is already taken by another page (excluding current page)
- * Returns error message if conflict exists, null if available
- */
-async function checkSubdomainConflict(
-  subdomain: string,
-  currentPageUrlKey: string
-): Promise<string | null> {
-  const { data, error } = await supabaseAdmin
-    .from('landing_pages')
-    .select('page_url_key, buyer_id')
-    .eq('subdomain', subdomain)
-    .is('deleted_at', null)
-    .neq('page_url_key', currentPageUrlKey)
-    .maybeSingle();
-  
-  if (error) {
-    console.error('[checkSubdomainConflict] Database error', { error });
-    return 'Failed to check subdomain availability';
-  }
-  
-  if (data) {
-    return `Subdomain "${subdomain}" is already used by another landing page (${data.buyer_id})`;
-  }
-  
-  return null;
-}
-
-/**
- * Generate public URL based on subdomain or path
- * If subdomain is provided, returns wildcard URL
- * Otherwise, returns traditional path-based URL
+ * Generate public URL based on seller_domain
+ * Format: https://{buyer_id}.{seller_domain}
  */
 function generatePublicUrl(
-  pageUrlKey: string,
-  subdomain: string | null | undefined
+  buyerId: string,
+  sellerDomain: string | null | undefined,
+  pageUrlKey: string
 ): string {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   
-  if (subdomain) {
-    // Wildcard subdomain URL
-    const mainDomain = baseUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
-    const protocol = baseUrl.startsWith('https') ? 'https' : 'http';
-    return `${protocol}://${subdomain}.${mainDomain}`;
+  if (sellerDomain) {
+    // Wildcard domain URL: buyer_id.seller_domain
+    const protocol = sellerDomain.includes('localhost') ? 'http' : 'https';
+    return `${protocol}://${buyerId}.${sellerDomain}`;
   } else {
-    // Traditional path-based URL
+    // Traditional path-based URL (fallback)
     return `${baseUrl}/p/${pageUrlKey}`;
   }
 }
@@ -236,41 +184,9 @@ export async function publishLanding(
     
     const validMeta = metaResult.data as PublishMeta;
     
-    // Auto-sync: page_url_key = subdomain (one buyer = one subdomain)
-    const slug = validMeta.subdomain;
+    // Auto-generate page_url_key from buyer_id and seller_id
+    const slug = `${validMeta.buyer_id}-${validMeta.seller_id}-${validMeta.mmyy}`;
     validMeta.page_url_key = slug;
-    
-    // 2a. Validate subdomain
-    if (validMeta.subdomain) {
-      const subdomainError = validateSubdomain(validMeta.subdomain);
-      if (subdomainError) {
-        console.warn('[publishLanding] Invalid subdomain', {
-          slug,
-          subdomain: validMeta.subdomain,
-          error: subdomainError,
-        });
-        
-        return {
-          ok: false,
-          error: subdomainError,
-        };
-      }
-      
-      // Check for subdomain conflicts (also checks page_url_key since slug = subdomain)
-      const conflictError = await checkSubdomainConflict(validMeta.subdomain, slug);
-      if (conflictError) {
-        console.warn('[publishLanding] Subdomain conflict', {
-          slug,
-          subdomain: validMeta.subdomain,
-          error: conflictError,
-        });
-        
-        return {
-          ok: false,
-          error: conflictError,
-        };
-      }
-    }
     
     // 3. Check throttle
     if (isThrottled(slug)) {
@@ -346,7 +262,7 @@ export async function publishLanding(
     
     // 7. Upsert to landing_pages table
     const now = new Date().toISOString();
-    const publicUrl = generatePublicUrl(slug, validMeta.subdomain);
+    const publicUrl = generatePublicUrl(validMeta.buyer_id, validMeta.seller_domain, slug);
     
     const { error: upsertError } = await supabaseAdmin
       .from('landing_pages')
@@ -354,7 +270,7 @@ export async function publishLanding(
         {
           page_url_key: slug,
           campaign_id: validMeta.campaign_id || null,
-          subdomain: validMeta.subdomain || null,
+          seller_domain: validMeta.seller_domain || null,
           page_url: publicUrl,                        // Store the full URL
           status: 'published',
           page_content: { normalized },
@@ -451,7 +367,7 @@ export async function publishLanding(
     updateThrottle(slug);
     
     const duration = Date.now() - startTime;
-    const url = generatePublicUrl(slug, validMeta.subdomain);
+    const url = generatePublicUrl(validMeta.buyer_id, validMeta.seller_domain, slug);
     
     // 10. Automatically authorize the published landing page URL for PostHog analytics
     try {

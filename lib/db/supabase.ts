@@ -54,7 +54,7 @@ export interface LandingPageRow {
   id?: string;
   campaign_id?: string | null;     // Foreign key to sl_campaigns
   page_url_key: string;             // Required: Unique slug
-  subdomain?: string | null;        // Optional subdomain for wildcard routing
+  seller_domain?: string | null;    // Seller's domain (e.g., "cyngn.com") for wildcard routing
   page_url?: string | null;         // Full URL to the landing page
   status: 'draft' | 'published' | 'archived';
   page_content: {

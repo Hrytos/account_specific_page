@@ -52,11 +52,12 @@ export const PublishMetaSchema = z.object({
     .optional()
     .nullable(),
   
-  subdomain: z
+  seller_domain: z
     .string()
-    .min(3, 'Subdomain must be at least 3 characters')
-    .max(63, 'Subdomain must not exceed 63 characters')
-    .regex(/^[a-z0-9]([a-z0-9-]{1,61}[a-z0-9])?$/, 'Subdomain must be lowercase alphanumeric with hyphens, no leading/trailing hyphens'),
+    .min(3, 'Seller domain must be at least 3 characters')
+    .max(253, 'Seller domain must not exceed 253 characters')
+    .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/, 'Invalid domain format (e.g., "cyngn.com", "techflow.io")')
+    .refine(val => val.includes('.'), 'Seller domain must include a TLD (e.g., "cyngn.com")'),
   
   buyer_id: z
     .string()

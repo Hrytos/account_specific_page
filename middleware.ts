@@ -1,18 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Get the main domain from environment or default
-const MAIN_DOMAIN = process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || '';
-
 /**
- * Extract subdomain from hostname
+ * Extract buyer_id and seller_domain from hostname
+ * Format: {buyer_id}.{seller_domain}
  * Examples:
- * - adient.yourcompany.com → "adient"
- * - www.yourcompany.com → null (main domain)
- * - yourcompany.com → null (main domain)
+ * - adient.cyngn.com → { buyerId: "adient", sellerDomain: "cyngn.com" }
+ * - duke.techflow.io → { buyerId: "duke", sellerDomain: "techflow.io" }
  * - localhost:3000 → null (development)
  */
-function extractSubdomain(hostname: string, mainDomain: string): string | null {
+function extractDomainInfo(hostname: string): { buyerId: string; sellerDomain: string } | null {
   // Remove port if present
   const host = hostname.split(':')[0];
   
@@ -21,29 +18,26 @@ function extractSubdomain(hostname: string, mainDomain: string): string | null {
     return null;
   }
   
-  // Skip if it's the main domain
-  if (host === mainDomain || host === `www.${mainDomain}`) {
+  // Split into parts
+  const parts = host.split('.');
+  
+  // Need at least 3 parts: subdomain.domain.tld (e.g., adient.cyngn.com)
+  if (parts.length < 3) {
     return null;
   }
   
-  // Extract subdomain
-  // Example: adient.yourcompany.com → adient
-  const parts = host.split('.');
-  const mainParts = mainDomain.split('.');
+  // First part is buyer_id
+  const buyerId = parts[0];
   
-  // If more parts than main domain, first part is subdomain
-  if (parts.length > mainParts.length) {
-    const subdomain = parts[0];
-    
-    // Skip www
-    if (subdomain === 'www') {
-      return null;
-    }
-    
-    return subdomain;
+  // Skip www
+  if (buyerId === 'www') {
+    return null;
   }
   
-  return null;
+  // Rest is seller_domain
+  const sellerDomain = parts.slice(1).join('.');
+  
+  return { buyerId, sellerDomain };
 }
 
 export function middleware(request: NextRequest) {
@@ -64,27 +58,29 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // Extract subdomain
-  const subdomain = extractSubdomain(hostname, MAIN_DOMAIN);
+  // Extract domain info
+  const domainInfo = extractDomainInfo(hostname);
   
-  // If no subdomain, continue normally
-  if (!subdomain) {
+  // If no domain info, continue normally
+  if (!domainInfo) {
     return NextResponse.next();
   }
   
-  // Rewrite to dynamic route with subdomain context
+  // Rewrite to dynamic route with domain context
   const url = request.nextUrl.clone();
   
-  // If already on /p/[slug], add subdomain to search params
+  // If already on /p/[slug], add domain info to search params
   if (pathname.startsWith('/p/')) {
-    url.searchParams.set('_subdomain', subdomain);
+    url.searchParams.set('_buyer_id', domainInfo.buyerId);
+    url.searchParams.set('_seller_domain', domainInfo.sellerDomain);
     return NextResponse.rewrite(url);
   }
   
-  // Otherwise, rewrite to /p/subdomain with flag
-  url.pathname = `/p/${subdomain}`;
-  url.searchParams.set('_subdomain', subdomain);
-  url.searchParams.set('_subdomain_route', 'true');
+  // Otherwise, rewrite to /p/buyer-domain with flag
+  url.pathname = `/p/${domainInfo.buyerId}`;
+  url.searchParams.set('_buyer_id', domainInfo.buyerId);
+  url.searchParams.set('_seller_domain', domainInfo.sellerDomain);
+  url.searchParams.set('_domain_route', 'true');
   
   return NextResponse.rewrite(url);
 }

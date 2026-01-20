@@ -15,13 +15,6 @@ export interface PublishResult {
 }
 
 /**
- * Publish metadata for landing pages
+ * Re-export PublishMeta from validation schema (single source of truth)
  */
-export interface PublishMeta {
-  page_url_key: string;
-  subdomain: string;
-  campaign_id?: string | null;
-  buyer_id: string;
-  seller_id: string;
-  mmyy: string;
-}
+export type { PublishMeta } from '@/lib/validation/publishMeta';
