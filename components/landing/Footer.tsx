@@ -29,9 +29,9 @@ export function Footer({ footer, brandLogoUrl }: FooterProps) {
   const hoverProps = useHoverTelemetry('footer_cta', 'footer');
 
   return (
-    <footer className="bg-[#1a202c] text-white py-6">
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <div className="flex flex-col items-center space-y-3">
+    <footer className="bg-[#2C3E50] text-white py-6">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
           {/* Logo */}
           {brandLogoUrl && (
             <div className="opacity-90">
@@ -43,14 +43,14 @@ export function Footer({ footer, brandLogoUrl }: FooterProps) {
             </div>
           )}
 
-          {/* Copyright and Powered by Hrytos */}
-          <div className="text-center space-y-1">
-            <p className="text-gray-400 text-sm">
+          {/* Copyright */}
+          <div className="text-center md:text-right">
+            <p className="text-gray-300 text-sm">
               © {currentYear} All rights reserved.
             </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center justify-center md:justify-end gap-2 text-xs text-gray-400 mt-1">
               <span>Powered by</span>
-              <span className="font-semibold text-blue-400">Hrytos</span>
+              <span className="font-semibold text-gray-200">Hrytos</span>
             </div>
           </div>
         </div>

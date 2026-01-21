@@ -32,13 +32,13 @@ export function SocialProofs({ social }: SocialProofsProps) {
     : 'Trusted by Industry Leaders';
 
   return (
-    <section id="social-proofs-section" className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white">
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center mb-16 leading-tight">
+    <section id="social-proofs-section" className="py-16 md:py-20 bg-white">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl">
+        <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-12 leading-tight">
           {headline}
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {social.items.map((item, index) => (
             <a
               key={index}
@@ -51,12 +51,12 @@ export function SocialProofs({ social }: SocialProofsProps) {
                 href: item.link,
                 linkType: 'external'
               })}
-              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 block"
+              className="group bg-gray-50 hover:bg-gray-100 rounded-lg p-6 border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-300 block"
             >
               {/* Type badge */}
               {item.type && (
-                <div className="mb-4">
-                  <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider rounded-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                <div className="mb-3">
+                  <span className="inline-block px-3 py-1 bg-[#2C3E50] text-white text-xs font-bold uppercase tracking-wide rounded">
                     {item.type}
                   </span>
                 </div>
@@ -64,16 +64,16 @@ export function SocialProofs({ social }: SocialProofsProps) {
 
               {/* Description */}
               {item.description && (
-                <h3 className="text-lg font-bold text-gray-900 leading-snug mb-6 min-h-[60px]">
+                <h3 className="text-base font-bold text-[#2C3E50] leading-snug mb-4">
                   {item.description}
                 </h3>
               )}
 
               {/* Link indicator */}
-              <div className="flex items-center text-blue-600 font-semibold text-sm group-hover:text-blue-700">
+              <div className="flex items-center text-gray-600 font-semibold text-sm group-hover:text-[#2C3E50]">
                 <span>Learn more</span>
                 <svg
-                  className="ml-2 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300"
+                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -92,7 +92,7 @@ export function SocialProofs({ social }: SocialProofsProps) {
 
         {/* Read More Button */}
         {social.readMoreLink && (
-          <div className="mt-12 text-center">
+          <div className="mt-10">
             <a
               href={social.readMoreLink}
               target="_blank"
@@ -103,11 +103,11 @@ export function SocialProofs({ social }: SocialProofsProps) {
                 href: social.readMoreLink || '',
                 linkType: 'external'
               })}
-              className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg rounded-xl border-2 border-gray-300 hover:border-blue-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center px-6 py-3 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
             >
               Read More
               <svg
-                className="ml-3 w-6 h-6"
+                className="ml-2 w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

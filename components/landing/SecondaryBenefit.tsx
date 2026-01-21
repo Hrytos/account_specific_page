@@ -34,22 +34,17 @@ export function SecondaryBenefit({ secondary }: SecondaryBenefitProps) {
     : 'Learn More';
 
   return (
-    <section className="relative py-20 md:py-28 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 bg-grid-white/[0.05] [mask-image:linear-gradient(0deg,transparent,rgba(255,255,255,0.3))]"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full opacity-10 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400 rounded-full opacity-10 blur-3xl"></div>
-      
-      <div className="container relative mx-auto px-4 md:px-6 max-w-5xl">
-        <div className="text-center">
+    <section className="py-16 md:py-20 bg-gray-50">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl">
+        <div>
           {secondary.title && (
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-4 leading-tight">
               {secondary.title}
             </h2>
           )}
 
           {secondary.body && (
-            <p className="text-lg md:text-xl text-blue-100 leading-relaxed max-w-3xl mx-auto mb-10">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed mb-6">
               {secondary.body}
             </p>
           )}
@@ -66,22 +61,12 @@ export function SecondaryBenefit({ secondary }: SecondaryBenefitProps) {
                 linkType: 'external'
               })}
               {...hoverProps}
-              className="inline-flex items-center px-10 py-4 bg-white hover:bg-gray-50 text-blue-700 font-semibold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+              className="inline-flex items-center px-6 py-3 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
             >
               {buttonText}
-              <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
             </a>
           )}
         </div>
-
-        {/* Decorative line */}
-        {!secondary.link && (
-          <div className="mt-12 flex justify-center">
-            <div className="w-24 h-1 bg-white/30 rounded-full"></div>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -12,7 +12,7 @@
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { validateAndNormalize } from '@/lib/validation';
-import { computeContentSha } from '@/lib/utils/hash';
+import { computeContentSha } from '@/lib/normalize/hash';
 import { validatePublishMeta } from '@/lib/validation/publishMeta';
 import { authorizeLandingPageUrl } from '@/lib/analytics/domainAuthorization';
 import { THROTTLE_CONFIG } from '@/config/constants';
@@ -219,7 +219,7 @@ export async function publishLanding(
     const normalized = validationResult.normalized;
     
     // 5. Compute content SHA
-    const contentSha = computeContentSha(normalized);
+    const contentSha = await computeContentSha(normalized);
     
     // 6. Check idempotency: query existing row
     const { data: existingRow, error: queryError } = await supabaseAdmin

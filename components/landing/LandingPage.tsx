@@ -23,6 +23,7 @@ import {
   SellerInfo,
   Footer,
 } from './index';
+import { CyngnAbmTemplate } from './templates';
 
 export interface LandingPageProps {
   content: NormalizedContent;
@@ -31,11 +32,22 @@ export interface LandingPageProps {
 /**
  * Complete Landing Page component
  * Renders all sections from normalized content
+ * 
+ * Supports multiple templates:
+ * - 'default': Standard template with all sections
+ * - 'cyngn-abm': Bespoke ABM template for Cyngn
+ * 
  * Sections auto-skip if their data is empty (no visual gaps)
  * 
  * Note: Analytics wrapper is handled by the parent page component
  */
 export function LandingPage({ content }: LandingPageProps) {
+  // Check for template type and render appropriate template
+  if (content.templateType === 'cyngn-abm') {
+    return <CyngnAbmTemplate content={content} />;
+  }
+
+  // Default template
   return (
     <div className="min-h-screen bg-white">
       {/* SEO Meta - handled in page.tsx head */}
