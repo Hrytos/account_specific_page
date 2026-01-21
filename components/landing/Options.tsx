@@ -34,39 +34,39 @@ export function Options({ options }: OptionsProps) {
     : 'Learn More';
 
   return (
-    <section id="options-section" className="py-20 md:py-28 bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+    <section id="options-section" className="py-16 md:py-20 bg-white">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         {/* Dynamic title from normalized data */}
         {options.title && (
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-2">
             {options.title}
           </h2>
         )}
         
         {/* Dynamic intro text from synopsisAutomationOptions */}
         {options.intro && (
-          <p className="text-center text-gray-600 text-lg mb-16 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-gray-700 text-base md:text-lg mb-12 max-w-4xl leading-relaxed">
             {options.intro}
           </p>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {options.cards.map((card, index) => (
             <div
               key={index}
-              className="group bg-[#2C3E50] hover:bg-[#34495E] rounded-2xl p-10 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-[#2C3E50] hover:bg-[#34495E] rounded-lg p-8 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <h3 className="text-2xl font-bold mb-6 leading-tight">
+              <h3 className="text-xl md:text-2xl font-bold mb-4 leading-tight">
                 {card.title}
               </h3>
 
               {card.description && (
-                <p className="text-gray-300 leading-relaxed mb-8 text-base">
+                <p className="text-gray-300 leading-relaxed mb-6 text-base">
                   {card.description}
                 </p>
               )}
 
-              {options.meetingLink ? (
+              {options.meetingLink && (
                 <a
                   href={options.meetingLink}
                   target="_blank"
@@ -78,14 +78,10 @@ export function Options({ options }: OptionsProps) {
                     linkType: 'external'
                   })}
                   {...hoverProps}
-                  className="block w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg text-center"
+                  className="inline-block px-6 py-3 bg-white hover:bg-gray-100 text-[#2C3E50] font-bold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {buttonText}
                 </a>
-              ) : (
-                <button className="w-full px-8 py-4 bg-white hover:bg-gray-50 text-[#2C3E50] font-semibold rounded-xl transition-all duration-300 transform group-hover:scale-105 shadow-md hover:shadow-lg">
-                  {buttonText}
-                </button>
               )}
             </div>
           ))}

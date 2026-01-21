@@ -187,11 +187,19 @@ export interface Footer {
 }
 
 /**
+ * Template types for landing pages
+ * - 'default': Standard template with all sections
+ * - 'cyngn-abm': Bespoke ABM template optimized for Cyngn seller
+ */
+export type TemplateType = 'default' | 'cyngn-abm';
+
+/**
  * Complete normalized landing page content structure
  * This is the canonical format consumed by the renderer
  */
 export interface NormalizedContent {
   title: string;
+  templateType?: TemplateType; // Which template to render with
   seo?: SeoMeta;
   brand?: Brand;
   hero: Hero;
@@ -211,6 +219,9 @@ export interface RawLandingContent {
   // Company names (required fields)
   BuyersName: string;
   SellersName: string;
+
+  // Template type (optional, defaults to 'default')
+  templateType?: 'default' | 'cyngn-abm';
 
   // Required fields
   biggestBusinessBenefitBuyerStatement: string;

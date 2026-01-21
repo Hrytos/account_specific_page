@@ -23,6 +23,7 @@ import type {
   Footer,
   SeoMeta,
   Brand,
+  TemplateType,
 } from './normalized.types';
 
 /**
@@ -221,8 +222,12 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
   };
 
   // Construct normalized content
+  // Template type (defaults to 'default' if not specified)
+  const templateType: TemplateType = raw.templateType || 'default';
+
   const normalized: NormalizedContent = {
     title,
+    templateType,
     seo,
     brand,
     hero,

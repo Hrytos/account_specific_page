@@ -33,29 +33,28 @@ export function Proof({ proof }: ProofProps) {
   }
 
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+    <section className="py-16 md:py-20 bg-gray-50">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         {title && (
-          <div className="text-center mb-16 md:mb-20">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+          <div className="mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-2 leading-tight">
               {title}
             </h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
           </div>
         )}
 
         {/* Two-column layout: Summary on left, Quote on right */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left: Summary */}
           {(summaryTitle || summaryBody) && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {summaryTitle && (
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                <h3 className="text-2xl md:text-3xl font-bold text-[#2C3E50] leading-tight">
                   {summaryTitle}
                 </h3>
               )}
               {summaryBody && (
-                <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                   {summaryBody}
                 </p>
               )}
@@ -64,32 +63,21 @@ export function Proof({ proof }: ProofProps) {
 
           {/* Right: Quote/Testimonial */}
           {quote && quote.text && (
-            <div className="relative bg-white p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 hover:shadow-3xl transition-shadow duration-300">
-              {/* Large Quotation Mark */}
-              <div className="absolute -top-5 -left-5 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-xl">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                </svg>
-              </div>
-
-              <blockquote className="relative mt-4">
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 font-normal">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <blockquote className="space-y-6">
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-normal italic">
                   "{quote.text}"
                 </p>
 
                 {quote.attribution && (
-                  <footer className="border-t border-gray-200 pt-6">
+                  <footer className="border-t border-gray-200 pt-4">
                     {quote.attribution.name && (
-                      <cite className="block text-gray-900 font-bold text-lg not-italic mb-1">
+                      <cite className="block text-[#2C3E50] font-bold text-base not-italic">
                         {quote.attribution.name}
                       </cite>
                     )}
                     {(quote.attribution.role || quote.attribution.company) && (
-                      <p className="text-gray-600 text-sm font-medium">
+                      <p className="text-gray-600 text-sm mt-1">
                         {[quote.attribution.role, quote.attribution.company]
                           .filter(Boolean)
                           .join(' • ')}
@@ -98,9 +86,6 @@ export function Proof({ proof }: ProofProps) {
                   </footer>
                 )}
               </blockquote>
-
-              {/* Decorative elements */}
-              <div className="absolute bottom-4 right-4 w-24 h-24 bg-blue-200 rounded-full opacity-20 blur-2xl"></div>
             </div>
           )}
         </div>

@@ -35,25 +35,20 @@ export function Hero({ hero }: HeroProps) {
   const vimeoId = videoUrl ? parseVimeoId(videoUrl) : null;
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-white to-blue-50 py-16 md:py-24 lg:py-32 overflow-hidden">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
-      
+    <section className="relative bg-white py-12 md:py-16 lg:py-20 overflow-hidden">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-        {/* Headline - Centered at top */}
-        <div className="text-center mb-12 lg:mb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight max-w-5xl mx-auto">
-            {headline}
-          </h1>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Text Content - Left Column */}
-          <div className="space-y-8 lg:pr-8">
+          <div className="space-y-6">
+            {/* Headline - Left aligned, large and bold */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#2C3E50] leading-tight">
+              {headline}
+            </h1>
+
             {subhead && (
-              <div className="space-y-4 text-lg md:text-xl text-gray-600 leading-relaxed">
+              <div className="space-y-4 text-base md:text-lg text-gray-700 leading-relaxed">
                 {subhead.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="text-gray-600">
+                  <p key={idx}>
                     {paragraph}
                   </p>
                 ))}
@@ -65,13 +60,34 @@ export function Hero({ hero }: HeroProps) {
                 <p>{shortDescription}</p>
               </div>
             )}
+
+            {/* CTA Button - Prominent */}
+            {cta && cta.href && (
+              <div className="pt-4">
+                <a
+                  href={cta.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackCtaClick({
+                    id: 'book_meeting',
+                    location: 'hero',
+                    href: cta.href,
+                    linkType: cta.href.startsWith('http') ? 'external' : 'internal'
+                  })}
+                  {...hoverProps}
+                  className="inline-flex items-center justify-center px-8 py-4 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  {cta.text || 'Get Started'}
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Video/Media - Right Column */}
           {videoUrl && (
             <div className="w-full">
               {vimeoId ? (
-                <div className="relative w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/10" style={{ paddingBottom: '56.25%' }}>
+                <div className="relative w-full bg-gray-900 rounded-lg overflow-hidden shadow-xl" style={{ paddingBottom: '56.25%' }}>
                   <iframe
                     src={getVimeoEmbedUrl(vimeoId)}
                     className="absolute top-0 left-0 w-full h-full"
@@ -83,7 +99,7 @@ export function Hero({ hero }: HeroProps) {
                   />
                 </div>
               ) : (
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-12 text-center shadow-xl ring-1 ring-gray-900/10">
+                <div className="bg-gray-900 rounded-lg p-12 text-center shadow-xl">
                   <a
                     href={videoUrl}
                     target="_blank"
@@ -94,7 +110,7 @@ export function Hero({ hero }: HeroProps) {
                       href: videoUrl,
                       linkType: 'external'
                     })}
-                    className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="inline-flex items-center px-8 py-4 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <svg className="mr-2 w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z"/>
@@ -106,75 +122,6 @@ export function Hero({ hero }: HeroProps) {
             </div>
           )}
         </div>
-
-        {/* CTA Buttons - Full Width Below Grid */}
-        {cta && cta.href && (
-          <div className="mt-12 flex items-center gap-8 flex-wrap">
-            <a
-              href={cta.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackCtaClick({
-                id: 'book_meeting',
-                location: 'hero',
-                href: cta.href,
-                linkType: cta.href.startsWith('http') ? 'external' : 'internal'
-              })}
-              {...hoverProps}
-              className="inline-flex items-center justify-center px-12 py-4 bg-[#2C3E50] hover:bg-[#1a252f] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 whitespace-nowrap"
-            >
-              {cta.text || 'Get Started'}
-            </a>
-            
-            <button
-              onClick={() => {
-                trackCtaClick({
-                  id: 'read_case_study',
-                  location: 'hero',
-                  href: '#benefits-section',
-                  linkType: 'internal'
-                });
-                const benefitsSection = document.getElementById('benefits-section');
-                benefitsSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
-            >
-              Explore Benefits
-            </button>
-            
-            <button
-              onClick={() => {
-                trackCtaClick({
-                  id: 'read_case_study',
-                  location: 'hero',
-                  href: '#options-section',
-                  linkType: 'internal'
-                });
-                const optionsSection = document.getElementById('options-section');
-                optionsSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
-            >
-              Review Automation Options
-            </button>
-            
-            <button
-              onClick={() => {
-                trackCtaClick({
-                  id: 'read_case_study',
-                  location: 'hero',
-                  href: '#social-proofs-section',
-                  linkType: 'internal'
-                });
-                const socialSection = document.getElementById('social-proofs-section');
-                socialSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 whitespace-nowrap text-base hover:underline underline-offset-4 cursor-pointer"
-            >
-              See Success Stories
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -26,56 +26,30 @@ export function Benefits({ benefits }: BenefitsProps) {
   }
 
   return (
-    <section id="benefits-section" className="py-20 md:py-28 bg-white">
-      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+    <section id="benefits-section" className="py-16 md:py-20 bg-gray-50">
+      <div className="container mx-auto px-6 md:px-12 max-w-7xl">
         {benefits.title && (
-          <div className="text-center mb-16 md:mb-20">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          <div className="mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#2C3E50] mb-2">
               {benefits.title}
             </h2>
-            <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {benefits.items.map((item, index) => (
             <div 
               key={index} 
-              className="group relative bg-white p-8 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
             >
-              {/* Icon Container */}
-              <div className="flex justify-center mb-6">
-                <div className="relative w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                  <svg
-                    className="w-8 h-8 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  {/* Decorative ring */}
-                  <div className="absolute inset-0 rounded-2xl ring-2 ring-blue-400 ring-opacity-50 group-hover:ring-opacity-100 transition-all duration-300"></div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center group-hover:text-blue-600 transition-colors duration-300">
+              <h3 className="text-xl font-bold text-[#2C3E50] mb-4">
                 {item.title}
               </h3>
               {item.body && (
-                <p className="text-gray-600 leading-relaxed text-center">
+                <p className="text-gray-700 leading-relaxed text-base">
                   {item.body}
                 </p>
               )}
-
-              {/* Decorative gradient on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl -z-10"></div>
             </div>
           ))}
         </div>
