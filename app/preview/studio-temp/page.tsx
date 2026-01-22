@@ -11,8 +11,15 @@ import type { NormalizedContent } from '@/lib/normalize/normalized.types';
 export default function PreviewPage() {
   const [content, setContent] = useState<NormalizedContent | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
     try {
       const stored = localStorage.getItem('preview-content');
       
@@ -27,7 +34,7 @@ export default function PreviewPage() {
       console.error('Preview error:', err);
       setError('Failed to load preview content. Please try again.');
     }
-  }, []);
+  }, [isClient]);
 
   if (error) {
     return (
