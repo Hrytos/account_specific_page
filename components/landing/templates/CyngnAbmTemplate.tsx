@@ -118,7 +118,7 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
-            <div className="flex items-center">
+            <a href="https://www.cyngn.com/" target="_blank" rel="noopener noreferrer" className="flex items-center">
               {content.brand?.logoUrl ? (
                 <img 
                   src={content.brand.logoUrl} 
@@ -132,7 +132,7 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
                   className="h-8 md:h-9 w-auto"
                 />
               )}
-            </div>
+            </a>
             
             {/* CTA Button */}
             <a
@@ -343,16 +343,6 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
                       title="Customer Testimonial"
                     />
                   </div>
-                  
-                  {/* Video Attribution */}
-                  {content.proof.quote.attribution?.name && (
-                    <div className="mt-4 text-sm text-slate-600">
-                      <p className="font-semibold text-slate-800">{content.proof.quote.attribution.name.toUpperCase()}</p>
-                      {content.proof.quote.attribution.role && (
-                        <p>{content.proof.quote.attribution.role}, {content.proof.quote.attribution.company}</p>
-                      )}
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -398,60 +388,52 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
         </section>
       )}
 
-      {/* Section 5: CTA Panel (Secondary Benefit) */}
-      {content.secondary?.title && (
-        <section className="py-14 md:py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-slate-800 rounded-2xl p-8 md:p-12 shadow-xl">
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-4 leading-tight">
-                {content.secondary.title}
-              </h2>
-              {content.secondary.body && (
-                <p className="text-base md:text-lg text-slate-300 leading-relaxed mb-8">
-                  {content.secondary.body}
-                </p>
-              )}
-              
-              {/* Form Row */}
-              <div className="flex flex-col sm:flex-row gap-4 max-w-xl">
-                <input
-                  type="email"
-                  placeholder="Work email"
-                  className="flex-1 h-12 md:h-14 px-5 rounded-lg bg-white text-slate-800 placeholder-slate-500 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  className="h-12 md:h-14 px-8 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap"
-                >
-                  Tell me more
-                </button>
-              </div>
+      {/* Section 5: CTA Panel - Discover Your Payback Period */}
+      <section className="py-14 md:py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-slate-800 rounded-2xl p-8 md:p-12 shadow-xl">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-4 leading-tight">
+              Discover Your Payback Period
+            </h2>
+            <p className="text-base md:text-lg text-slate-300 leading-relaxed mb-8">
+              Our team is standing by to analyze your existing workflows and model ROI and payback projections to support a data-driven case for deploying autonomy.
+            </p>
+            
+            {/* HubSpot Meeting Embed */}
+            <div className="bg-white rounded-lg p-4">
+              <div 
+                className="meetings-iframe-container" 
+                data-src="https://meetings.hubspot.com/cseidenberg/abm?embed=true"
+              />
+              <script 
+                type="text/javascript" 
+                src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
+                async
+              />
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* Section 6: About Seller */}
-      {content.seller?.body && (
-        <section className="py-10 md:py-12 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
-              <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                About {sellerName}
-              </h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                {content.seller.body}
-              </p>
-            </div>
+      {/* Section 6: About Cyngn */}
+      <section className="py-10 md:py-12 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <h3 className="text-lg font-semibold text-slate-800 mb-3">
+              About Cyngn
+            </h3>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Cyngn develops and deploys autonomous vehicle technology for industrial organizations like manufacturers and logistics companies. The Company addresses significant challenges facing industrial organizations today, such as labor shortages and costly safety incidents.
+            </p>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-slate-800 text-white py-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0">
-            <div className="flex items-center gap-3">
+            <a href="https://www.cyngn.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
               {content.brand?.logoUrl ? (
                 <img 
                   src={content.brand.logoUrl} 
@@ -465,14 +447,16 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
                   className="h-6 w-auto opacity-90 brightness-0 invert"
                 />
               )}
-            </div>
+            </a>
             <div className="text-center md:text-right">
               <p className="text-slate-400 text-sm">
                 © {new Date().getFullYear()} All rights reserved.
               </p>
               <div className="flex items-center justify-center md:justify-end gap-2 text-xs text-slate-500 mt-1">
                 <span>Powered by</span>
-                <span className="font-semibold text-slate-400">Hrytos</span>
+                <a href="https://www.hrytos.com/" target="_blank" rel="noopener noreferrer" className="font-semibold text-slate-400 hover:text-slate-300 transition-colors">
+                  Hrytos
+                </a>
               </div>
             </div>
           </div>
