@@ -75,7 +75,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 disabled={loading}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed text-slate-900 placeholder:text-slate-400"
                 autoFocus
                 required
               />

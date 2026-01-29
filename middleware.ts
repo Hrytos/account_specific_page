@@ -87,8 +87,14 @@ export function middleware(request: NextRequest) {
   // Extract domain info
   const domainInfo = extractDomainInfo(hostname);
   
-  // If no domain info, continue normally
+  // If no domain info (base domain like abm.hrytos.com), redirect to login
   if (!domainInfo) {
+    // If on home page, redirect to login
+    if (pathname === '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
     return NextResponse.next();
   }
   
