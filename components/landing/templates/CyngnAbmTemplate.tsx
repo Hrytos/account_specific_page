@@ -103,7 +103,8 @@ function getVimeoId(url: string | null | undefined): string | null {
 
 export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
   const sellerName = content.hero.sellerName || 'Cyngn';
-  const meetingLink = content.options?.meetingLink || content.hero.cta?.href || '#';
+  const buyerName = content.buyersName || 'your company'; // Use from normalized content
+  const meetingLink = 'https://meetings.hubspot.com/cseidenberg/abm'; // Hardcoded for Cyngn ABM template
   const videoId = getVimeoId(content.hero.media?.videoUrl);
   
   // Hover telemetry for CTAs
@@ -241,30 +242,50 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
               {content.benefits.title}
             </h2>
 
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
-              {/* Left Column: Stats Paragraph */}
-              <div className="flex items-center justify-center lg:justify-start">
-                <p className="text-base md:text-lg text-slate-700 leading-relaxed">
-                  Companies that deploy {sellerName}'s high-capacity autonomous tuggers typically see a <strong className="text-teal-700">33% boost in productivity</strong>, a <strong className="text-teal-700">64% reduction in labor costs</strong>, and an average payback period of just <strong className="text-teal-700">18-months</strong>.
-                </p>
-              </div>
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+              {/* Left Column: Summary Paragraph (if exists) */}
+              {content.benefits.items && content.benefits.items.some(item => item.title === '__SUMMARY__') && (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-lg md:text-xl text-slate-700 leading-relaxed text-center">
+                    {content.benefits.items.find(item => item.title === '__SUMMARY__')?.body}
+                  </p>
+                </div>
+              )}
 
-              {/* Right Column: 2x2 Feature Grid */}
+              {/* Right Column: 2x2 Feature Grid (default tiles or from data) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {DEFAULT_BENEFIT_TILES.map((tile) => {
-                  const IconComponent = ICON_MAP[tile.icon];
-                  return (
-                    <div key={tile.title} className="bg-teal-50/60 border border-teal-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-start gap-2 mb-2">
-                        <IconComponent />
-                        <h3 className="text-base font-semibold text-slate-800">{tile.title}</h3>
+                {/* Show benefit items if they exist (excluding summary) */}
+                {content.benefits.items && content.benefits.items.filter(item => item.title !== '__SUMMARY__').length > 0 ? (
+                  content.benefits.items
+                    .filter(item => item.title !== '__SUMMARY__')
+                    .slice(0, 4)
+                    .map((item) => (
+                      <div key={item.title} className="bg-teal-50/60 border border-teal-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <h3 className="text-base font-semibold text-slate-800 mb-2">{item.title}</h3>
+                        {item.body && (
+                          <p className="text-sm text-slate-600 leading-relaxed">
+                            {item.body}
+                          </p>
+                        )}
                       </div>
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {tile.description}
-                      </p>
-                    </div>
-                  );
-                })}
+                    ))
+                ) : (
+                  /* Fallback to default hardcoded tiles */
+                  DEFAULT_BENEFIT_TILES.map((tile) => {
+                    const IconComponent = ICON_MAP[tile.icon];
+                    return (
+                      <div key={tile.title} className="bg-teal-50/60 border border-teal-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-2 mb-2">
+                          <IconComponent />
+                          <h3 className="text-base font-semibold text-slate-800">{tile.title}</h3>
+                        </div>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          {tile.description}
+                        </p>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
@@ -326,25 +347,31 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
         <section className="py-14 md:py-20 bg-slate-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-semibold text-teal-700 mb-10 md:mb-12 text-center leading-tight">
-              {sellerName} has helped companies like {content.title} with similar needs
+              {sellerName} has helped companies like {buyerName} with similar needs
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-              {/* Left Column: Video */}
-              {videoId && (
-                <div className="relative">
-                  <div className="relative w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-xl" style={{ paddingBottom: '56.25%' }}>
-                    <iframe
-                      src={`https://player.vimeo.com/video/${videoId}?badge=0&autopause=0&player_id=0&app_id=58479`}
-                      className="absolute top-0 left-0 w-full h-full"
-                      frameBorder="0"
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                      title="Customer Testimonial"
-                    />
+              {/* Left Column: Video - Use pro  of.videoUrl if available, otherwise fall back to hero video */}
+              {(() => {
+                const proofVideoId = getVimeoId(content.proof?.videoUrl);
+                const fallbackVideoId = videoId; // Hero video as fallback
+                const displayVideoId = proofVideoId || fallbackVideoId;
+                
+                return displayVideoId ? (
+                  <div className="relative">
+                    <div className="relative w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl overflow-hidden shadow-xl" style={{ paddingBottom: '56.25%' }}>
+                      <iframe
+                        src={`https://player.vimeo.com/video/${displayVideoId}?badge=0&autopause=0&player_id=0&app_id=58479`}
+                        className="absolute top-0 left-0 w-full h-full"
+                        frameBorder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title="Customer Testimonial"
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null;
+              })()}
 
               {/* Right Column: Testimonial */}
               <div className="bg-white rounded-2xl border border-slate-100 p-8 md:p-10 shadow-sm">
@@ -389,7 +416,7 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
       )}
 
       {/* Section 5: CTA Panel - Discover Your Payback Period */}
-      <section className="py-14 md:py-20 bg-white">
+      <section className="pt-14 md:pt-20 pb-8 md:pb-10 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-slate-800 rounded-2xl p-8 md:p-12 shadow-xl">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-4 leading-tight">
@@ -415,8 +442,8 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
         </div>
       </section>
 
-      {/* Section 6: About Cyngn */}
-      <section className="py-10 md:py-12 bg-slate-50">
+      {/* Section 6: About Cyngn (Hardcoded) */}
+      <section className="pt-6 pb-10 md:pt-8 md:pb-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h3 className="text-lg font-semibold text-slate-800 mb-3">

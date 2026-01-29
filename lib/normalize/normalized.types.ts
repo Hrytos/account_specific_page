@@ -132,6 +132,7 @@ export interface Proof {
   summaryTitle?: string | null;
   summaryBody?: string | null;
   quote?: Quote;
+  videoUrl?: string | null; // Separate video for proof section
 }
 
 /**
@@ -199,6 +200,7 @@ export type TemplateType = 'default' | 'cyngn-abm';
  */
 export interface NormalizedContent {
   title: string;
+  buyersName?: string | null; // Buyer company name for personalization
   templateType?: TemplateType; // Which template to render with
   seo?: SeoMeta;
   brand?: Brand;
@@ -236,6 +238,7 @@ export interface RawLandingContent {
   // Benefits
   highestOperationalBenefit?: {
     highestOperationalBenefitStatement?: string;
+    highestOperationalBenefitSummary?: string; // Summary paragraph for benefits section
     benefits?: Array<{
       statement: string;
       content?: string;
@@ -255,6 +258,7 @@ export interface RawLandingContent {
     summaryTitle?: string;
     summaryContent?: string; // Match actual JSON field name
     quoteContent?: string; // Top-level quote field
+    quoteVideoLink?: string; // Separate video link for proof section
     quoteAuthorFullname?: string; // Top-level attribution fields
     quoteAuthorDesignation?: string;
     quoteAuthorCompany?: string;

@@ -126,6 +126,18 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
         body: sanitize(b.content),
       })),
     };
+    
+    // Add summary paragraph as a special benefit item if provided
+    if (raw.highestOperationalBenefit.highestOperationalBenefitSummary) {
+      if (!benefits.items) {
+        benefits.items = [];
+      }
+      // Add summary as first item with special marker
+      benefits.items.unshift({
+        title: '__SUMMARY__',
+        body: sanitize(raw.highestOperationalBenefit.highestOperationalBenefitSummary),
+      });
+    }
   }
 
   // Options section
@@ -159,6 +171,7 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
       title: sanitize(raw.mostRelevantProof.title),
       summaryTitle: sanitize(raw.mostRelevantProof.summaryTitle),
       summaryBody: sanitize(raw.mostRelevantProof.summaryContent), // Use summaryContent from JSON
+      videoUrl: sanitize(raw.mostRelevantProof.quoteVideoLink), // Support separate video for proof section
       quote: {
         text: sanitize(raw.mostRelevantProof.quoteContent), // Use quoteContent from JSON
         attribution: {
@@ -227,6 +240,7 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
 
   const normalized: NormalizedContent = {
     title,
+    buyersName: raw.BuyersName || null, // Store buyer name for personalization
     templateType,
     seo,
     brand,
