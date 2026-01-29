@@ -147,9 +147,9 @@ export function mapRawToNormalized(raw: RawLandingContent): NormalizedContent {
     const buyerName = raw.BuyersName || extractBuyerName(raw.biggestBusinessBenefitBuyerStatement);
     const sellerName = raw.SellersName || extractSellerName(raw.sellerDescription);
     
-    // Generate title: "How can [Seller] help [Buyer] ?"
+    // Generate title: "How can [Seller] help [Buyer]?"
     const optionsTitle = buyerName && sellerName
-      ? `How can ${sellerName} help ${buyerName} ?`
+      ? `How can ${sellerName} help ${buyerName}?`
       : null;
     
     options = {

@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
+ * Check if user is authenticated via cookie
+ */
+function isAuthenticated(request: NextRequest): boolean {
+  const authCookie = request.cookies.get('studio_auth');
+  return authCookie?.value === 'authenticated';
+}
+
+/**
  * Extract buyer_id and seller_domain from hostname
  * Format: {buyer_id}.{seller_domain}
  * Examples:
@@ -45,16 +53,34 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Skip middleware for:
-  // - API routes
+  // - API routes (except protected ones)
   // - Static files
   // - Next.js internals
-  // - Studio (admin area)
+  // - Auth endpoints
   if (
-    pathname.startsWith('/api/') ||
+    pathname.startsWith('/api/auth') ||
     pathname.startsWith('/_next/') ||
-    pathname.startsWith('/studio') ||
     pathname.includes('.')
   ) {
+    return NextResponse.next();
+  }
+  
+  // Protect home page and studio
+  const protectedPaths = ['/', '/studio'];
+  const isProtectedPath = protectedPaths.some(path => 
+    pathname === path || pathname.startsWith('/studio')
+  );
+  
+  if (isProtectedPath && !isAuthenticated(request)) {
+    // Redirect to login page
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
+  }
+  
+  // Skip domain routing for API and Studio
+  if (pathname.startsWith('/api/') || pathname.startsWith('/studio') || pathname.startsWith('/login')) {
     return NextResponse.next();
   }
   

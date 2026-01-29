@@ -35,7 +35,7 @@ export default function StudioPage() {
   const [buyerId, setBuyerId] = useState('');
   const [sellerId, setSellerId] = useState('');
   const [mmyy, setMmyy] = useState('');
-  const [sellerDomain, setSellerDomain] = useState('');
+  const [sellerDomain, setSellerDomain] = useState('abm.hrytos.com');
   const [campaignId, setCampaignId] = useState('');
   const [campaigns, setCampaigns] = useState<Array<{id: string; name: string}>>([]);
 
