@@ -137,12 +137,10 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
             
             {/* CTA Button */}
             <a
-              href={meetingLink}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#calendar"
               onMouseEnter={headerCtaHover.onMouseEnter}
               onMouseLeave={headerCtaHover.onMouseLeave}
-              onClick={() => trackCtaClick({ id: 'book_meeting', location: 'hero', href: meetingLink, linkType: 'external' })}
+              onClick={() => trackCtaClick({ id: 'book_meeting', location: 'hero', href: '#calendar', linkType: 'internal' })}
               className="inline-flex items-center justify-center rounded-lg bg-teal-700 hover:bg-teal-800 text-white px-6 py-2.5 text-sm font-semibold shadow-sm transition-all duration-300"
             >
               Talk to {sellerName}
@@ -183,12 +181,10 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
 
               <div className="mt-8">
                 <a
-                  href={meetingLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="#calendar"
                   onMouseEnter={heroCtaHover.onMouseEnter}
                   onMouseLeave={heroCtaHover.onMouseLeave}
-                  onClick={() => trackCtaClick({ id: 'book_meeting', location: 'hero', href: meetingLink, linkType: 'external' })}
+                  onClick={() => trackCtaClick({ id: 'book_meeting', location: 'hero', href: '#calendar', linkType: 'internal' })}
                   className="inline-flex items-center justify-center rounded-lg bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 font-semibold shadow-sm transition-all duration-300"
                 >
                   Talk to {sellerName}
@@ -238,19 +234,18 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
       {content.benefits?.title && (
         <section className="pt-14 pb-12 md:pt-16 md:pb-14 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl md:text-4xl font-semibold text-teal-700 mb-4 text-center leading-tight">
-              {content.benefits.title}
-            </h2>
-
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-              {/* Left Column: Summary Paragraph (if exists) */}
-              {content.benefits.items && content.benefits.items.some(item => item.title === '__SUMMARY__') && (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-lg md:text-xl text-slate-700 leading-relaxed text-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+              {/* Left Column: Title and Summary */}
+              <div className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-semibold text-teal-700 leading-tight">
+                  {content.benefits.title}
+                </h2>
+                {content.benefits.items && content.benefits.items.some(item => item.title === '__SUMMARY__') && (
+                  <p className="text-lg md:text-xl text-slate-700 leading-relaxed">
                     {content.benefits.items.find(item => item.title === '__SUMMARY__')?.body}
                   </p>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Right Column: 2x2 Feature Grid (default tiles or from data) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -309,12 +304,10 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
             {/* Single Global CTA */}
             <div className="mb-10 md:mb-12">
               <a
-                href={meetingLink}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#calendar"
                 onMouseEnter={optionsCtaHover.onMouseEnter}
                 onMouseLeave={optionsCtaHover.onMouseLeave}
-                onClick={() => trackCtaClick({ id: 'book_meeting', location: 'proof_section', href: meetingLink, linkType: 'external' })}
+                onClick={() => trackCtaClick({ id: 'book_meeting', location: 'proof_section', href: '#calendar', linkType: 'internal' })}
                 className="inline-flex items-center px-6 py-3 bg-teal-700 hover:bg-teal-800 text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
               >
                 Talk to {sellerName}
@@ -416,13 +409,13 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
       )}
 
       {/* Section 5: CTA Panel - Discover Your Payback Period */}
-      <section className="pt-14 md:pt-20 pb-8 md:pb-10 bg-white">
+      <section id="calendar" className="pt-14 md:pt-20 pb-8 md:pb-10 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-slate-800 rounded-2xl p-8 md:p-12 shadow-xl">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-4 leading-tight">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-4 leading-tight text-center">
               Discover Your Payback Period
             </h2>
-            <p className="text-base md:text-lg text-slate-300 leading-relaxed mb-8">
+            <p className="text-base md:text-lg text-slate-300 leading-relaxed mb-8 text-center">
               Our team is standing by to analyze your existing workflows and model ROI and payback projections to support a data-driven case for deploying autonomy.
             </p>
             
