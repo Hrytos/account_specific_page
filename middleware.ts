@@ -21,8 +21,14 @@ function extractDomainInfo(hostname: string): { buyerId: string; sellerDomain: s
   // Remove port if present
   const host = hostname.split(':')[0];
   
-  // Skip localhost
-  if (host === 'localhost' || host === '127.0.0.1') {
+  // Skip localhost and deployment platforms
+  if (
+    host === 'localhost' || 
+    host === '127.0.0.1' ||
+    host.endsWith('.vercel.app') ||
+    host.endsWith('.netlify.app') ||
+    host.endsWith('.railway.app')
+  ) {
     return null;
   }
   
