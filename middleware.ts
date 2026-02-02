@@ -21,10 +21,11 @@ function extractDomainInfo(hostname: string): { buyerId: string; sellerDomain: s
   // Remove port if present
   const host = hostname.split(':')[0];
   
-  // Skip localhost and deployment platforms
+  // Skip localhost, deployment platforms, and base application domain
   if (
     host === 'localhost' || 
     host === '127.0.0.1' ||
+    host === 'abm.hrytos.com' || // Your base domain
     host.endsWith('.vercel.app') ||
     host.endsWith('.netlify.app') ||
     host.endsWith('.railway.app')
