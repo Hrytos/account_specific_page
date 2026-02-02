@@ -17,6 +17,7 @@ interface PostHogInstance {
   capture: (event: string, properties?: Record<string, any>) => void;
   register: (properties: Record<string, any>) => void;
   group: (groupType: string, groupKey: string, groupProperties?: Record<string, any>) => void;
+  identify: (distinctId: string, properties?: Record<string, any>) => void;
   startSessionRecording: () => void;
   stopSessionRecording: () => void;
   opt_out_capturing: () => void;

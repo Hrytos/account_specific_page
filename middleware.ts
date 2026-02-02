@@ -66,9 +66,9 @@ export function middleware(request: NextRequest) {
   }
   
   // Protect home page and studio
-  const protectedPaths = ['/', '/studio'];
+  const protectedPaths = ['/', '/studio', '/tokens'];
   const isProtectedPath = protectedPaths.some(path => 
-    pathname === path || pathname.startsWith('/studio')
+    pathname === path || pathname.startsWith('/studio') || pathname.startsWith('/tokens')
   );
   
   if (isProtectedPath && !isAuthenticated(request)) {

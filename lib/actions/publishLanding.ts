@@ -222,22 +222,45 @@ export async function publishLanding(
     const contentSha = await computeContentSha(normalized);
     
     // 6. Check idempotency: query existing row
-    const { data: existingRow, error: queryError } = await supabaseAdmin
-      .from('landing_pages')
-      .select('content_sha, published_at')
-      .eq('page_url_key', slug)
-      .eq('status', 'published')
-      .maybeSingle();
-    
-    if (queryError) {
-      console.error('[publishLanding] Database query error', {
+    let existingRow = null;
+    try {
+      const { data, error: queryError } = await supabaseAdmin
+        .from('landing_pages')
+        .select('content_sha, published_at')
+        .eq('page_url_key', slug)
+        .eq('status', 'published')
+        .maybeSingle();
+      
+      if (queryError) {
+        console.error('[publishLanding] Database query error', {
+          slug,
+          error: {
+            message: queryError.message,
+            details: queryError.details,
+            hint: queryError.hint,
+            code: queryError.code,
+          },
+        });
+        
+        return {
+          ok: false,
+          error: 'Database error during idempotency check',
+        };
+      }
+      existingRow = data;
+    } catch (fetchError) {
+      console.error('[publishLanding] Network/fetch error during idempotency check', {
         slug,
-        error: queryError,
+        error: fetchError instanceof Error ? {
+          name: fetchError.name,
+          message: fetchError.message,
+          cause: fetchError.cause,
+        } : fetchError,
       });
       
       return {
         ok: false,
-        error: 'Database error during idempotency check',
+        error: 'Network error connecting to database. Please try again.',
       };
     }
     

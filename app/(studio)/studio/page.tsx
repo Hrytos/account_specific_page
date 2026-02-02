@@ -21,7 +21,39 @@ import { validateAndNormalize, type ValidationResult } from '@/lib/validation';
 import { LandingPage } from '@/components/landing/LandingPage';
 import { suggestPageUrlKey } from '@/lib/utils/slug';
 import { publishLanding } from '@/lib/actions/publishLanding';
+import { ContactMultiSelect } from '@/components/studio/ContactMultiSelect';
 import type { PublishResult } from '@/lib/types';
+
+// Contact type for multi-select
+interface Contact {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  full_name: string;
+  company_name: string;
+  job_title: string | null;
+  hasToken: boolean;
+}
+
+// Token generation result
+interface TokenGenerationResult {
+  success: boolean;
+  tokens: Array<{
+    token: string;
+    tracking_url: string;
+    contact: {
+      id: string;
+      email: string;
+      full_name: string;
+    };
+  }>;
+  summary: {
+    total: number;
+    new: number;
+    existing: number;
+  };
+}
 
 export default function StudioPage() {
   const [jsonInput, setJsonInput] = useState('');
@@ -38,6 +70,10 @@ export default function StudioPage() {
   const [sellerDomain, setSellerDomain] = useState('abm.hrytos.com');
   const [campaignId, setCampaignId] = useState('');
   const [campaigns, setCampaigns] = useState<Array<{id: string; name: string}>>([]);
+  
+  // Contact selection for token generation
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [tokenResult, setTokenResult] = useState<TokenGenerationResult | null>(null);
 
   // Load campaigns on mount
   useEffect(() => {
@@ -130,11 +166,13 @@ export default function StudioPage() {
     setJsonInput('');
     setValidationResult(null);
     setPublishResult(null);
+    setTokenResult(null);
     setBuyerId('');
     setSellerId('');
     setMmyy('');
     setSellerDomain('');
     setCampaignId('');
+    setSelectedContacts([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -178,6 +216,72 @@ export default function StudioPage() {
       // Call the publish server action
       const result = await publishLanding(rawJson, meta, secret);
       setPublishResult(result);
+
+      // If successful and contacts selected, generate tokens
+      if (result.ok && selectedContacts.length > 0 && campaignId) {
+        console.log('[Studio] Token generation conditions met:', {
+          resultOk: result.ok,
+          contactCount: selectedContacts.length,
+          campaignId,
+          resultUrl: result.url,
+        });
+        
+        try {
+          // Get the landing page ID from the result URL
+          // URL format: https://domain/p/{page_url_key}
+          const pageUrlKey = result.url?.split('/p/').pop();
+          console.log('[Studio] Extracted pageUrlKey:', pageUrlKey);
+          
+          if (!pageUrlKey) {
+            console.error('[Studio] Failed to extract pageUrlKey from URL:', result.url);
+            return;
+          }
+
+          // Fetch the landing page ID by page_url_key directly
+          const lpResponse = await fetch(`/api/landing-pages?page_url_key=${encodeURIComponent(pageUrlKey)}`);
+          const lpData = await lpResponse.json();
+          console.log('[Studio] Landing page lookup response:', lpData);
+          
+          const landingPage = lpData.landing_page;
+
+          if (landingPage?.id) {
+            console.log('[Studio] Found landing page ID:', landingPage.id);
+            
+            // Generate tokens for selected contacts
+            const tokenResponse = await fetch('/api/tokens/generate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contact_ids: selectedContacts.map(c => c.id),
+                campaign_id: campaignId,
+                landing_page_id: landingPage.id,
+              }),
+            });
+
+            console.log('[Studio] Token generation response status:', tokenResponse.status);
+
+            if (tokenResponse.ok) {
+              const tokens = await tokenResponse.json();
+              setTokenResult(tokens);
+              console.log('[Studio] Generated tokens:', tokens);
+            } else {
+              const errorText = await tokenResponse.text();
+              console.error('[Studio] Token generation failed:', tokenResponse.status, errorText);
+            }
+          } else {
+            console.error('[Studio] Landing page not found for pageUrlKey:', pageUrlKey, 'Response:', lpData);
+          }
+        } catch (tokenError) {
+          console.error('[Studio] Token generation failed:', tokenError);
+          // Don't fail the whole publish, just log the error
+        }
+      } else {
+        console.log('[Studio] Token generation skipped - conditions not met:', {
+          resultOk: result.ok,
+          contactCount: selectedContacts.length,
+          campaignId: campaignId || '(empty)',
+        });
+      }
 
       // If successful, scroll to result
       if (result.ok) {
@@ -297,6 +401,27 @@ export default function StudioPage() {
                 <div>https://{sellerDomain}/p/{buyerId}-{sellerId}-{mmyy}</div>
               </div>
             </div>
+          )}
+        </div>
+
+        {/* Contact Selection for Token Generation */}
+        <div className="mb-6 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            👥 Contact Selection (Optional)
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Select contacts to generate personalized tracking links. Tokens enable person identification in analytics.
+          </p>
+          <ContactMultiSelect
+            selectedContacts={selectedContacts}
+            onSelectionChange={setSelectedContacts}
+            campaignId={campaignId}
+            disabled={!campaignId}
+          />
+          {!campaignId && (
+            <p className="mt-2 text-xs text-amber-600">
+              ⚠️ Select a campaign first to enable contact selection
+            </p>
           )}
         </div>
 
@@ -437,6 +562,55 @@ export default function StudioPage() {
                     )}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Token Generation Result */}
+            {tokenResult && tokenResult.success && (
+              <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                  🔗 Generated Tracking Links
+                </h3>
+                
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200 mb-3">
+                  <div className="text-sm text-green-800">
+                    ✅ Generated {tokenResult.summary.new} new token{tokenResult.summary.new !== 1 ? 's' : ''}
+                    {tokenResult.summary.existing > 0 && (
+                      <span className="text-green-600">
+                        {' '}({tokenResult.summary.existing} existing reused)
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2 max-h-60 overflow-auto">
+                  {tokenResult.tokens.map((token) => (
+                    <div key={token.token} className="p-2 bg-gray-50 rounded border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {token.contact.full_name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {token.contact.email}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(token.tracking_url);
+                            alert('Copied to clipboard!');
+                          }}
+                          className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        >
+                          Copy Link
+                        </button>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-400 font-mono truncate" title={token.tracking_url}>
+                        {token.tracking_url}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

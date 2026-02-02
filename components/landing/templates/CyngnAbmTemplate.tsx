@@ -9,9 +9,9 @@
  * Template Type: 'cyngn-abm'
  */
 
+import { useState, useEffect, type ReactNode } from 'react';
 import type { NormalizedContent } from '@/lib/normalize/normalized.types';
 import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
-import type { ReactNode } from 'react';
 
 export interface CyngnAbmTemplateProps {
   content: NormalizedContent;
@@ -91,6 +91,45 @@ const ICON_MAP: Record<string, () => ReactNode> = {
   clock: ClockIcon,
   badge: BadgeIcon,
 };
+
+/**
+ * HubSpot Meeting Embed Component
+ * Renders client-side only to prevent hydration mismatch
+ */
+function HubSpotMeetingEmbed() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    
+    // Load HubSpot script after mount
+    const existingScript = document.querySelector('script[src*="MeetingsEmbedCode.js"]');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = 'https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Show loading placeholder during SSR and initial mount
+  if (!mounted) {
+    return (
+      <div 
+        className="meetings-iframe-container" 
+        style={{ minWidth: '312px', minHeight: '615px', height: '756px' }}
+      />
+    );
+  }
+
+  // Client-side: render the actual embed container
+  return (
+    <div 
+      className="meetings-iframe-container" 
+      data-src="https://meetings.hubspot.com/cseidenberg/abm?embed=true"
+    />
+  );
+}
 
 /**
  * Extract Vimeo video ID from URL
@@ -419,17 +458,9 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
               Our team is standing by to analyze your existing workflows and model ROI and payback projections to support a data-driven case for deploying autonomy.
             </p>
             
-            {/* HubSpot Meeting Embed */}
+            {/* HubSpot Meeting Embed - Client-side only to prevent hydration mismatch */}
             <div className="bg-white rounded-lg p-4">
-              <div 
-                className="meetings-iframe-container" 
-                data-src="https://meetings.hubspot.com/cseidenberg/abm?embed=true"
-              />
-              <script 
-                type="text/javascript" 
-                src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
-                async
-              />
+              <HubSpotMeetingEmbed />
             </div>
           </div>
         </div>
