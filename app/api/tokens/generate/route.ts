@@ -61,8 +61,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get base URL from environment or request
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+    // Get landing page to determine the correct domain for tracking URLs
+    const { data: landingPage, error: landingPageError } = await supabaseAdmin
+      .from('landing_pages')
+      .select('seller_domain')
+      .eq('id', landing_page_id)
+      .single();
+
+    if (landingPageError || !landingPage) {
+      return NextResponse.json(
+        { error: 'Landing page not found' },
+        { status: 404 }
+      );
+    }
+
+    // Use seller_domain from landing page, fallback to NEXT_PUBLIC_SITE_URL or request origin
+    const domain = landingPage.seller_domain || 
+                   process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 
+                   new URL(request.url).host;
+    const protocol = domain.includes('localhost') ? 'http' : 'https';
+    const baseUrl = `${protocol}://${domain}`;
 
     // 1. Check which contacts already have tokens for this campaign + landing page
     const { data: existingTokens, error: existingError } = await supabaseAdmin
