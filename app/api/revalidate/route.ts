@@ -130,13 +130,6 @@ export async function POST(request: NextRequest) {
       revalidatePath(pagePath);
       
       const duration = Date.now() - startTime;
-      
-      console.log('[Revalidate API] Success:', {
-        slug,
-        path: pagePath,
-        cacheTag,
-        duration: `${duration}ms`,
-      });
 
       return NextResponse.json(
         {

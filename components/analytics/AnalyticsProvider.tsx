@@ -66,7 +66,9 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 
     if (!posthogKey) {
-      console.warn('NEXT_PUBLIC_POSTHOG_KEY not found. Analytics disabled.');
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('NEXT_PUBLIC_POSTHOG_KEY not found. Analytics disabled.');
+      }
       return;
     }
 
@@ -74,48 +76,38 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       // Get current domain for multi-tenant support
       const currentDomain = window.location.hostname;
       const isDevelopment = currentDomain === 'localhost' || currentDomain.includes('localhost');
-      
-      console.log(`[Analytics] Initializing for domain: ${currentDomain} (dev: ${isDevelopment})`);
 
       // Initialize PostHog with explicit Web Analytics configuration
       posthog.init(posthogKey, {
         api_host: posthogHost || 'https://us.posthog.com',
-        person_profiles: 'identified_only', // Required for newer versions
+        person_profiles: 'identified_only',
         autocapture: true,
-        capture_pageview: true, // CRITICAL: Enable automatic $pageview events
-        capture_pageleave: true, // CRITICAL: Enable automatic $pageleave events
+        capture_pageview: true,
+        capture_pageleave: true,
         session_recording: {
           maskAllInputs: true,
         },
         disable_session_recording: false,
-        // Multi-tenant domain tracking
-        cross_subdomain_cookie: false, // Each domain gets separate tracking
-        persistence: 'localStorage', // Use localStorage for multi-domain
-        // Development settings
+        cross_subdomain_cookie: false,
+        persistence: 'localStorage',
         loaded: (posthog) => {
-          console.log(`[Analytics] PostHog loaded successfully for ${currentDomain}`);
-          console.log(`[Analytics] PostHog distinct_id: ${posthog.get_distinct_id()}`);
           setIsInitialized(true);
-          
-          // Start tracking by default (can be changed for consent)
           setIsTracking(true);
 
-          // Send initial test event to verify connection
+          // Send initial event
           posthog.capture('analytics_provider_loaded', {
             domain: currentDomain,
             is_development: isDevelopment,
             loaded_at: new Date().toISOString()
           });
           
-          // FORCE a pageview event for Web Analytics
+          // Force a pageview event
           posthog.capture('$pageview', {
             $current_url: window.location.href,
             $title: document.title,
             domain: currentDomain,
             is_development: isDevelopment
           });
-          
-          console.log('[Analytics] Initial test event and pageview sent');
         },
       });
 
@@ -127,9 +119,10 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
           user_agent: navigator.userAgent,
         });
         
-        // Make PostHog available on window for debugging
-        (window as any).posthog = posthog;
-        console.log('PostHog attached to window object');
+        // Make PostHog available on window for debugging in development
+        if (isDevelopment) {
+          (window as any).posthog = posthog;
+        }
       }
 
     } catch (error) {
@@ -145,7 +138,6 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       posthog.opt_in_capturing();
       posthog.startSessionRecording();
       setIsTracking(true);
-      console.log('Analytics tracking started');
     } catch (error) {
       console.error('Failed to start tracking:', error);
     }
@@ -159,7 +151,6 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       posthog.opt_out_capturing();
       posthog.stopSessionRecording();
       setIsTracking(false);
-      console.log('Analytics tracking stopped');
     } catch (error) {
       console.error('Failed to stop tracking:', error);
     }
@@ -190,11 +181,8 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       if (context.buyer_id) {
         posthog.group('buyer', context.buyer_id, {
           buyer_id: context.buyer_id,
-          // Add any buyer-specific properties here
         });
       }
-
-      console.log('Analytics context registered:', context);
     } catch (error) {
       console.error('Failed to register analytics context:', error);
     }

@@ -82,20 +82,16 @@ export function AnalyticsPageWrapper({ children, pageProps, className }: Analyti
 
     async function identifyPerson() {
       try {
-        console.log('[AnalyticsPageWrapper] Identifying person from token:', token);
-
         // Fetch contact data from token
         const response = await fetch(`/api/token-contact?token=${encodeURIComponent(token!)}`);
         
         if (!response.ok) {
-          console.warn('[AnalyticsPageWrapper] Token lookup failed:', response.status);
           return;
         }
 
         const data: TokenContactData = await response.json();
         
         if (!data.contact?.email) {
-          console.warn('[AnalyticsPageWrapper] No contact email in token data');
           return;
         }
 
@@ -159,15 +155,9 @@ export function AnalyticsPageWrapper({ children, pageProps, className }: Analyti
           campaign_name: data.campaign?.name,
         });
 
-        console.log('[AnalyticsPageWrapper] Person identified:', {
-          email: data.contact.email,
-          name: data.contact.full_name,
-          company: data.contact.company_name,
-        });
-
         setIdentified(true);
       } catch (error) {
-        console.error('[AnalyticsPageWrapper] Failed to identify person:', error);
+        console.error('Failed to identify person:', error);
       }
     }
 
@@ -179,24 +169,8 @@ export function AnalyticsPageWrapper({ children, pageProps, className }: Analyti
     if (isInitialized && isTracking && pageProps) {
       const context = buildTenantContext(pageProps);
       registerContext(context);
-      
-      console.log('[AnalyticsPageWrapper] Analytics context registered for page:', pageProps.page_url_key);
-      console.log('[AnalyticsPageWrapper] Full context:', context);
-    } else {
-      console.log('[AnalyticsPageWrapper] Waiting for analytics:', {
-        isInitialized,
-        isTracking,
-        hasPageProps: !!pageProps
-      });
     }
   }, [isInitialized, isTracking, pageProps, registerContext]);
-
-  // Log identification status for debugging
-  useEffect(() => {
-    if (token && identified) {
-      console.log('[AnalyticsPageWrapper] Person identification complete');
-    }
-  }, [token, identified]);
 
   return (
     <div className={className}>

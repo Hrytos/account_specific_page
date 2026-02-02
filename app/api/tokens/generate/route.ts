@@ -84,8 +84,6 @@ export async function POST(request: NextRequest) {
     const existingContactIds = new Set((existingTokens || []).map((t) => t.contact_id));
     const newContactIds = contact_ids.filter((id) => !existingContactIds.has(id));
 
-    console.log(`Token generation: ${newContactIds.length} new, ${existingTokens?.length || 0} existing`);
-
     // 3. Fetch contact details for new tokens
     let newTokens: any[] = [];
     

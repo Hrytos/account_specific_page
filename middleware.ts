@@ -57,21 +57,23 @@ export function middleware(request: NextRequest) {
   // - Static files
   // - Next.js internals
   // - Auth endpoints
+  // - Login page (let client-side handle redirect)
   if (
-    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
+    pathname.startsWith('/login') ||
     pathname.includes('.')
   ) {
     return NextResponse.next();
   }
   
-  // Protect home page and studio
-  const protectedPaths = ['/', '/studio', '/tokens'];
-  const isProtectedPath = protectedPaths.some(path => 
-    pathname === path || pathname.startsWith('/studio') || pathname.startsWith('/tokens')
-  );
+  // Check if path requires authentication
+  const requiresAuth = 
+    pathname === '/' || 
+    pathname.startsWith('/studio') || 
+    pathname.startsWith('/tokens');
   
-  if (isProtectedPath && !isAuthenticated(request)) {
+  if (requiresAuth && !isAuthenticated(request)) {
     // Redirect to login page
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -79,22 +81,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
   
-  // Skip domain routing for API and Studio
-  if (pathname.startsWith('/api/') || pathname.startsWith('/studio') || pathname.startsWith('/login')) {
+  // Skip domain-based routing for studio and token management pages
+  if (pathname.startsWith('/studio') || pathname.startsWith('/tokens')) {
     return NextResponse.next();
   }
   
   // Extract domain info
   const domainInfo = extractDomainInfo(hostname);
   
-  // If no domain info (base domain like abm.hrytos.com), redirect to login
+  // If no domain info (localhost or base domain), allow authenticated users to access dashboard
   if (!domainInfo) {
-    // If on home page, redirect to login
-    if (pathname === '/') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
-    }
+    // Authenticated users can access the dashboard (/)
+    // This allows the dashboard to work on localhost and base domains
     return NextResponse.next();
   }
   

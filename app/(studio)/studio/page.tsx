@@ -17,6 +17,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { validateAndNormalize, type ValidationResult } from '@/lib/validation';
 import { LandingPage } from '@/components/landing/LandingPage';
 import { suggestPageUrlKey } from '@/lib/utils/slug';
@@ -56,11 +57,17 @@ interface TokenGenerationResult {
 }
 
 export default function StudioPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const editId = searchParams.get('edit');
+  
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [validating, setValidating] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Metadata fields
@@ -74,6 +81,50 @@ export default function StudioPage() {
   // Contact selection for token generation
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [tokenResult, setTokenResult] = useState<TokenGenerationResult | null>(null);
+
+  // Load existing landing page if edit mode
+  useEffect(() => {
+    if (editId) {
+      loadExistingPage(editId);
+    }
+  }, [editId]);
+
+  async function loadExistingPage(id: string) {
+    try {
+      setLoadingEdit(true);
+      const response = await fetch(`/api/landing-pages?id=${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to load landing page');
+      }
+      const data = await response.json();
+      const page = data.landing_page;
+      
+      if (page) {
+        // Set metadata fields
+        setBuyerId(page.buyer_id || '');
+        setSellerId(page.seller_id || '');
+        setMmyy(page.mmyy || '');
+        setSellerDomain(page.seller_domain || 'abm.hrytos.com');
+        setCampaignId(page.campaign_id || '');
+        
+        // Set the JSON content
+        if (page.page_content?.raw) {
+          setJsonInput(JSON.stringify(page.page_content.raw, null, 2));
+        } else if (page.page_content?.normalized) {
+          setJsonInput(JSON.stringify(page.page_content.normalized, null, 2));
+        } else if (page.page_content) {
+          setJsonInput(JSON.stringify(page.page_content, null, 2));
+        }
+        
+        setEditMode(true);
+      }
+    } catch (error) {
+      console.error('Failed to load landing page:', error);
+      alert('Failed to load landing page for editing');
+    } finally {
+      setLoadingEdit(false);
+    }
+  }
 
   // Load campaigns on mount
   useEffect(() => {
@@ -170,12 +221,21 @@ export default function StudioPage() {
     setBuyerId('');
     setSellerId('');
     setMmyy('');
-    setSellerDomain('');
+    setSellerDomain('abm.hrytos.com');
     setCampaignId('');
     setSelectedContacts([]);
+    setEditMode(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    // Clear the edit query param if present
+    if (editId) {
+      router.push('/studio');
+    }
+  };
+
+  const handleBackToDashboard = () => {
+    router.push('/');
   };
 
   const handlePublish = async () => {
@@ -302,14 +362,42 @@ export default function StudioPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Loading State for Edit Mode */}
+        {loadingEdit && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-700">Loading landing page...</p>
+            </div>
+          </div>
+        )}
+        
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🎨 Landing Page Studio
-          </h1>
-          <p className="text-gray-600">
-            Paste → Validate → Normalize → Preview your landing page
+          <div className="flex items-center gap-4 mb-2">
+            <button
+              onClick={handleBackToDashboard}
+              className="inline-flex items-center text-gray-600 hover:text-gray-900"
+              title="Back to Dashboard"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <h1 className="text-4xl font-bold text-gray-900">
+              🎨 {editMode ? 'Edit Landing Page' : 'Landing Page Studio'}
+            </h1>
+          </div>
+          <p className="text-gray-600 ml-10">
+            {editMode ? 'Update your existing landing page' : 'Paste → Validate → Normalize → Preview your landing page'}
           </p>
+          {editMode && (
+            <div className="mt-2 ml-10">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Editing Mode
+              </span>
+            </div>
+          )}
         </header>
 
         {/* Metadata Section */}

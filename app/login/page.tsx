@@ -9,7 +9,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/studio';
+  const redirect = searchParams.get('redirect') || '/';
 
   useEffect(() => {
     // Clear any previous errors when password changes
@@ -18,6 +18,10 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    if (loading) return; // Prevent double submission
+    
     setError('');
     setLoading(true);
 
@@ -25,21 +29,23 @@ function LoginForm() {
       const response = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ password }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Redirect to the intended page
-        router.push(redirect);
-        router.refresh();
+        // Give the cookie a moment to be set, then redirect
+        await new Promise(resolve => setTimeout(resolve, 200));
+        window.location.href = redirect;
       } else {
         setError(data.error || 'Invalid password');
+        setLoading(false);
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('An error occurred. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -112,7 +118,7 @@ function LoginForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Authenticating...
+                  Redirecting...
                 </span>
               ) : (
                 'Continue'

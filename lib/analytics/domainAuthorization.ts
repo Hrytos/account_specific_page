@@ -42,9 +42,11 @@ export class PostHogDomainManager {
    */
   async getCurrentAuthorizedUrls(): Promise<string[]> {
     try {
-      console.log('[PostHogDomainManager] Attempting to get PostHog authorized URLs...');
-      console.log('[PostHogDomainManager] Using API key:', this.config.posthogApiKey.substring(0, 10) + '...');
-      console.log('[PostHogDomainManager] Host:', this.config.posthogHost);
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
+      if (isDevelopment) {
+        console.log('[PostHogDomainManager] Attempting to get PostHog authorized URLs...');
+      }
       
       // Try multiple possible API endpoints
       const endpoints = [
@@ -75,7 +77,6 @@ export class PostHogDomainManager {
       for (const endpoint of endpoints) {
         try {
           const fullUrl = `${this.config.posthogHost}${endpoint}`;
-          console.log(`[PostHogDomainManager] Trying endpoint: ${fullUrl}`);
           
           const response = await fetch(fullUrl, {
             headers: {
