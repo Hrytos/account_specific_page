@@ -9,9 +9,9 @@
  * Template Type: 'cyngn-abm'
  */
 
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import type { NormalizedContent } from '@/lib/normalize/normalized.types';
-import { trackCtaClick, useHoverTelemetry } from '@/lib/analytics/hooks';
+import { trackCtaClick, useHoverTelemetry, useCalendarTracking } from '@/lib/analytics/hooks';
 
 export interface CyngnAbmTemplateProps {
   content: NormalizedContent;
@@ -150,6 +150,14 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
   const headerCtaHover = useHoverTelemetry('header_cta', 'header');
   const heroCtaHover = useHoverTelemetry('hero_cta', 'hero');
   const optionsCtaHover = useHoverTelemetry('options_cta', 'options');
+
+  // Calendar tracking - ref for the calendar container
+  const calendarContainerRef = useRef<HTMLDivElement>(null);
+  useCalendarTracking(calendarContainerRef, {
+    calendarId: 'hubspot_cyngn_abm',
+    calendarType: 'hubspot',
+    threshold: 0.5, // Track when 50% visible
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -459,7 +467,7 @@ export function CyngnAbmTemplate({ content }: CyngnAbmTemplateProps) {
             </p>
             
             {/* HubSpot Meeting Embed - Client-side only to prevent hydration mismatch */}
-            <div className="bg-white rounded-lg p-4">
+            <div ref={calendarContainerRef} className="bg-white rounded-lg p-4">
               <HubSpotMeetingEmbed />
             </div>
           </div>

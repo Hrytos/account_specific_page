@@ -17,7 +17,8 @@ export {
   trackCtaClick,
   useCtaTracking,
   trackVideoEvent,
-  trackError
+  trackError,
+  useCalendarTracking, // NEW: Calendar engagement tracking
 } from './hooks';
 
 // Context utilities

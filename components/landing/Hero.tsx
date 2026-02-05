@@ -93,7 +93,6 @@ export function Hero({ hero }: HeroProps) {
                     className="absolute top-0 left-0 w-full h-full"
                     frameBorder="0"
                     allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
                     title="Product video"
                     loading="lazy"
                   />
